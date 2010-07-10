@@ -4,13 +4,14 @@
 #game .gameGrid {
   position: relative;
   margin: 0 auto;
+  z-index: 1;
 }
 
 #game .gameGrid .cases {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 1;
+  z-index: 10;
   line-height: 0;
   background: #333;
 }
@@ -32,6 +33,10 @@
   margin: 0px 5px;
   background: #999;
   display: inline-block;
+}
+
+#game .gamePanel .toolObject.dragging {
+  background: red;
 }
 
 #game .gameGrid .cases .case {
