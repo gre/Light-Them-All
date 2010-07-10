@@ -1,0 +1,39 @@
+
+
+
+#game .gameGrid {
+  position: relative;
+  margin: 0 auto;
+}
+
+#game .gameGrid .cases {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  line-height: 0;
+  background: #333;
+}
+
+#game .gameGrid .lasers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+}
+
+#game .gamePanel {
+  padding: 10px;
+  text-align: center;
+  background: #222;
+}
+
+#game .gamePanel .toolObject {
+  margin: 0px 5px;
+  background: #999;
+  display: inline-block;
+}
+
+#game .gameGrid .cases .case {
+  display: inline-block;
+}
