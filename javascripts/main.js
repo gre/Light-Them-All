@@ -1,13 +1,53 @@
 (function(){
   
-  var isMobileWebKit = RegExp("Mobile").test(navigator.userAgent);
+  var isChrome = /chrome/i.test(navigator.userAgent);
+  var isAndroidOS = /android/i.test(navigator.userAgent);
+  var hasTouch = ('ontouchstart' in window);
   
-  var Game = lta.Game = function() {
+  var caseSize = {};
+  var gridSize = { w: 12, h: 10 };
   
-    var gridSize = { w: 12, h: 10 };
-    var caseSize = {};
+  
+  var Event = lta.Event = function() {
     
-    var toolObjectSize = {};
+    var useTouch = hasTouch && !isChrome;
+    var target = document;
+    
+    var touchstart, touchmove, touchend;
+    
+    if(useTouch) {
+      touchstart = function(fn) {
+        $(target).bind('touchstart', fn);
+      };
+      touchmove = function(fn) {
+        $(target).bind('touchmove', fn);
+      };
+      touchend = function(fn) {
+        $(target).bind('touchend', fn);
+      };
+    }
+    else {
+      touchstart = function(fn) {
+        $(document).bind('mousedown', fn);
+      };
+      touchmove = function(fn) {
+        $(document).bind('mousemove', fn);
+      };
+      touchend = function(fn) {
+        $(document).bind('mouseup', fn);
+      };
+    }
+        
+    return {
+      touchstart: touchstart,
+      touchmove: touchmove,
+      touchend: touchend
+    }
+  }();
+  
+  
+  var GameGrid = lta.GameGrid = function() {
+    
     
     var casesNode = [];
     var cases = [];
@@ -19,32 +59,16 @@
       return casesNode[y*gridSize.w+x];
     };
     
-    var getCaseNodeByPosition = function(pageX, pageY) {
-      var gameGrid = $('#game .gameGrid');
-      var offset = gameGrid.offset();
-      if(pageX < offset.left || pageX > offset.left+gameGrid.width() 
-      || pageY < offset.top  || pageY > offset.top+gameGrid.height()) {
-        return null;
+    var start = function(level) {
+      for(var y=0; y<gridSize.h; ++y) {
+        for(var x=0; x<gridSize.w; ++x) {
+          var ctx = getCase(x, y);
+          ctx.fillStyle = 'rgb('+Math.floor((255 * x) / gridSize.w)+', '+Math.floor((255 * y) / gridSize.h)+', 128)';
+          ctx.fillRect(0, 0, caseSize.w, caseSize.h);
+        }
       }
-      var x = Math.floor((pageX - offset.left) / caseSize.w);
-      var y = Math.floor((pageY - offset.top) / caseSize.h);
-      return getCaseNode(x, y);
-    };
+    }
     
-    var bindPanelToolObject = function(node) {
-      node.bind(isMobileWebKit ? 'touchstart' : 'mousedown', function() {
-        node.addClass('dragging');
-        var dragHelper = $('<div id="dragHelper"></div>').hide().append(node.clone())
-        .css({
-          position: 'absolute',
-          width: toolObjectSize.w+'px',
-          height: toolObjectSize.h+'px',
-          zIndex: 20,
-          background: 'rgba(255,255,255,0.5)'
-        });
-        $('#game').append(dragHelper);
-      });
-    };
     
     var bindCase = function(node) {
       var ctx = node[0].getContext('2d');
@@ -67,14 +91,71 @@
       })
     };
     
+    return {
+      getCaseNode: getCaseNode,
+      start: start,
+      
+      init: function(width) {        
+        var gameGrid = $('#game .gameGrid');
+        var appendTo = $('.cases', gameGrid).empty();
+        for(var y=0; y<gridSize.h; ++y) {
+          for(var x=0; x<gridSize.w; ++x) {
+            var i = y*gridSize.w+x;
+            var node = casesNode[i] = $('<canvas class="case" width="'+caseSize.w+'" height="'+caseSize.h+'"></canvas>').appendTo(appendTo);
+            cases[i] = node[0].getContext('2d');
+            bindCase(node);
+          }
+        }
+      }
+    }
+  }();
+  
+  
+  var Game = lta.Game = function() {
+    
+    var toolObjectSize = {};
+    
+    var getCaseNodeByPosition = function(pageX, pageY) {
+      var gameGrid = $('#game .gameGrid');
+      var offset = gameGrid.offset();
+      if(pageX < offset.left || pageX > offset.left+gameGrid.width() 
+      || pageY < offset.top  || pageY > offset.top+gameGrid.height()) {
+        return null;
+      }
+      var x = Math.floor((pageX - offset.left) / caseSize.w);
+      var y = Math.floor((pageY - offset.top) / caseSize.h);
+      return GameGrid.getCaseNode(x, y);
+    };
+    
+    
     var bindEvents = function() {
-      /*$(window).bind('pinch pinchstart tap doubletap swipe swipeleft swiperight touchstart touchmove touchend taphold tapstart tapcancel',
+      
+      /*
+      $(document).bind('mousestart mousemove mouseend drag dragstart dragend pinch pinchstart tap doubletap swipe swipeleft swiperight touchstart touchmove touchend taphold tapstart tapcancel',
       function(e){
         console.log(e.type);
       });
       */
       
-      $(window).bind(isMobileWebKit ? 'touchend' : 'mouseup', function(e){
+      Event.touchstart(function(e) {
+        var node = $(e.target);
+        
+        if(node.is('.toolObject')) {
+          e.preventDefault();
+          node.addClass('dragging');
+          var dragHelper = $('<div id="dragHelper"></div>').hide().append(node.clone()).css({
+            position: 'absolute',
+            width: toolObjectSize.w+'px',
+            height: toolObjectSize.h+'px',
+            zIndex: 20,
+            background: 'rgba(255,255,255,0.5)'
+          });
+          $('#game').append(dragHelper);
+        }
+        
+      });
+      
+      Event.touchend(function(e){
       
         var dragging = $('#game .toolObject.dragging');
         var dragHelper = $('#dragHelper');
@@ -86,12 +167,15 @@
           $('#game .case.draghover').removeClass('draghover').trigger('draghoverout').trigger('dropped', dragging);
         }
       });
-      $(window).bind(isMobileWebKit ? 'touchmove' : 'mousemove', function(e) {
+      
+      Event.touchmove(function(e) {
         var dragging = $('#game .toolObject.dragging');
         var dragHelper = $('#dragHelper');
         
         if(dragging.size()>0) {
         
+          //e.preventDefault();
+          
           var x, y;
           
           if(e.type=='touchmove') {
@@ -137,24 +221,16 @@
         var height = gridSize.h*size;
         caseSize.w = caseSize.h = size;
         
-        toolObjectSize.w = toolObjectSize.h = Math.floor(width / 4 - 15);
-        
-        var gameGrid = $('#game .gameGrid').width(width).height(height);
+        var gameGrid = $('#game .gameGrid').width(width).height(height)
         $('canvas.lasers, .cases', gameGrid).width(width).height(height);
-        var appendTo = $('.cases', gameGrid).empty();
-        for(var y=0; y<gridSize.h; ++y) {
-          for(var x=0; x<gridSize.w; ++x) {
-            var i = y*gridSize.w+x;
-            var node = casesNode[i] = $('<canvas class="case" width="'+caseSize.w+'" height="'+caseSize.h+'"></canvas>').appendTo(appendTo);
-            cases[i] = node[0].getContext('2d');
-            bindCase(node);
-          }
-        }
+        
+        GameGrid.init(width);
+        
+        toolObjectSize.w = toolObjectSize.h = Math.floor(width / 4 - 15);
         
         for(var i=0; i<7; ++i) {
           var tool = $('<canvas class="toolObject" width="'+toolObjectSize.w+'" height="'+toolObjectSize.h+'"></canvas>');
           $('#game .gamePanel').append(tool);
-          bindPanelToolObject(tool);
         }
         
         bindEvents();
@@ -163,13 +239,10 @@
       start: function(level) {
         if(!level) level=0;
         
-        for(var y=0; y<gridSize.h; ++y) {
-          for(var x=0; x<gridSize.w; ++x) {
-            var ctx = getCase(x, y);
-            ctx.fillStyle = 'rgb('+Math.floor((255 * x) / gridSize.w)+', '+Math.floor((255 * y) / gridSize.h)+', 128)';
-            ctx.fillRect(0, 0, caseSize.w, caseSize.h);
-          }
-        }
+        GameGrid.start(level);
+        
+        
+        
       }
     }
   }();
