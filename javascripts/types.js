@@ -10,7 +10,11 @@
       return c1 & c2; 
     }
   };
-   
+  
+  types.MapObject = { RECEPTOR: 1, LASER: 2, WALL: 3, BOMB: 4 };
+  
+  types.LevelMap = {};
+  
   types.Orientation = { TOPLEFT: 0, TOP: 1, TOPRIGHT: 2, RIGHT: 3, BOTTOMRIGHT: 4, BOTTOM: 5, BOTTOMLEFT: 6, LEFT: 7,
     next: function(o){
       return (o+1)%8;

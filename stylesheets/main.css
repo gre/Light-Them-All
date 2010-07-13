@@ -1,6 +1,4 @@
 
-
-
 #game .gameGrid {
   position: relative;
   margin: 0 auto;
@@ -8,12 +6,12 @@
 }
 
 #game .gameGrid .cases {
+  background: white;
   position: absolute;
   top: 0;
   left: 0;
   z-index: 10;
   line-height: 0;
-  background: #333;
 }
 
 #game .gameGrid .lasers {
@@ -42,4 +40,8 @@
 
 #game .gameGrid .cases .case {
   display: inline-block;
+}
+
+#game .case.hover {
+  opacity: 0.5;
 }
