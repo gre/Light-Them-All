@@ -201,6 +201,9 @@
         dragging = $(dragging);
         if(dragging.is('.toolObjectContainer')) {
           new Case(ctx).drop(dragging);
+          
+          var number = $('.number', dragging);
+          number.text(number.text()-1);
         }
       })
     };
@@ -289,6 +292,9 @@
         if(node.parent().is('.toolObjectContainer')) node = node.parent();
         
         if(node.is('.toolObjectContainer')) {
+          
+          if($('.number', node).text()==0) return;
+          
           e.preventDefault();
           node.addClass('dragging');
           var dragHelper = $('<div id="dragHelper"></div>').hide().append($('canvas', node).clone()).css({
@@ -379,7 +385,7 @@
         var margin = 5;
         
         for(var i=0; i<7; ++i) {
-          var tool = $('<div class="toolObjectContainer"><div class="number">'+(8-i)+'</div><canvas class="toolObject" width="'+(toolObjectSize.w-2*margin)+'" height="'+(toolObjectSize.h-2*margin)+'"></canvas></div>');
+          var tool = $('<div class="toolObjectContainer"><div class="number">'+Math.floor(Math.random()*5)+'</div><canvas class="toolObject" width="'+(toolObjectSize.w-2*margin)+'" height="'+(toolObjectSize.h-2*margin)+'"></canvas></div>');
           $('#game .gamePanel').append(tool);
         }
         
