@@ -199,7 +199,7 @@
       });
       node.bind('dropped', function(e, dragging) {
         dragging = $(dragging);
-        if(dragging.is('.toolObject')) {
+        if(dragging.is('.toolObjectContainer')) {
           new Case(ctx).drop(dragging);
         }
       })
@@ -286,10 +286,12 @@
       Event.touchstart(function(e) {
         var node = $(e.target);
         
-        if(node.is('.toolObject')) {
+        if(node.parent().is('.toolObjectContainer')) node = node.parent();
+        
+        if(node.is('.toolObjectContainer')) {
           e.preventDefault();
           node.addClass('dragging');
-          var dragHelper = $('<div id="dragHelper"></div>').hide().append(node.clone()).css({
+          var dragHelper = $('<div id="dragHelper"></div>').hide().append($('canvas', node).clone()).css({
             position: 'absolute',
             width: toolObjectSize.w+'px',
             height: toolObjectSize.h+'px',
@@ -303,7 +305,7 @@
       
       Event.touchend(function(e){
       
-        var dragging = $('#game .toolObject.dragging');
+        var dragging = $('#game .toolObjectContainer.dragging');
         var dragHelper = $('#dragHelper');
         if(dragging.size()>0) {
           dragging.removeClass('dragging');
@@ -315,7 +317,7 @@
       });
       
       Event.touchmove(function(e) {
-        var dragging = $('#game .toolObject.dragging');
+        var dragging = $('#game .toolObjectContainer.dragging');
         var dragHelper = $('#dragHelper');
         
         if(dragging.size()>0) {
@@ -372,13 +374,20 @@
         
         GameGrid.init(width);
         
-        toolObjectSize.w = toolObjectSize.h = Math.floor((width-10) / 7 - 10);
+        toolObjectSize.w = toolObjectSize.h = Math.floor(width / 7);
+        
+        var margin = 5;
         
         for(var i=0; i<7; ++i) {
-          var tool = $('<canvas class="toolObject" width="'+toolObjectSize.w+'" height="'+toolObjectSize.h+'"></canvas>');
+          var tool = $('<div class="toolObjectContainer"><div class="number">'+(8-i)+'</div><canvas class="toolObject" width="'+(toolObjectSize.w-2*margin)+'" height="'+(toolObjectSize.h-2*margin)+'"></canvas></div>');
           $('#game .gamePanel').append(tool);
         }
         
+        $(window).resize(function(){
+          gameGrid.css('margin', '0px auto');
+          var marginTopBottom = Math.floor(($(window).height() - $('#play').height())/2);
+          gameGrid.css('margin', marginTopBottom+'px auto');
+        }).resize();
         bindEvents();
       },
       

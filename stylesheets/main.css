@@ -22,20 +22,39 @@
 }
 
 #game .gamePanel {
-  padding: 5px;
   text-align: center;
   background: #222;
 }
 
-#game .gamePanel .toolObject {
-  margin: 5px;
-  margin-bottom: 0;
-  background: #999;
-  display: inline-block;
+#game .gamePanel .toolObjectContainer .number {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  border-radius: 8px;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border: 1px solid #300;
+  background: #600;
+  font-weight: bold;
+  color: white;
+  padding: 2px 5px;
 }
 
-#game .gamePanel .toolObject.dragging {
-  background: red;
+#game .gamePanel .toolObjectContainer {
+  padding: 5px;
+  display: inline-block;
+  background: #111;
+  position: relative;
+}
+#game .gamePanel .toolObjectContainer:nth-child(2n) {
+  background: #333;
+}
+#game .gamePanel .toolObject {
+  background: #555;
+}
+
+#game .gamePanel .toolObjectContainer.dragging {
+  background: #fff;
 }
 
 #game .gameGrid .cases .case {
