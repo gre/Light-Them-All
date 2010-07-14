@@ -8,6 +8,8 @@
   
   var types = lta.types;
   
+    
+  var toolObjectSize = {};
   var caseSize = {};
   var gridSize = { w: 8, h: 8 };
   
@@ -48,9 +50,81 @@
     }
   }();
   
-  var Case = lta.Case = function(ctx) {
+  var PanelObject = function(arg) {
+    var ctx, node, container;
     
-    var node = $(ctx.canvas);
+    if(!arg.fillRect) {
+      node = arg;
+      if(node.is('.toolObjectContainer')) {
+        var canvas = $('canvas', node);
+        if(canvas.size()==0) {
+          var number = $('<div class="number"></div>');
+          var canvas = $('<canvas class="toolObject" />').attr('width', toolObjectSize.w-10).attr('height', toolObjectSize.h-10);
+          node.show().empty().append(number).append(canvas);
+        }
+        container = node;
+        node = $('canvas', container);
+      }
+      ctx = node[0].getContext('2d');
+    }
+    else {
+      ctx = arg;
+      node = $(ctx.canvas);
+      container = node.parents('.toolObjectContainer:first');
+    }
+    
+    var drawImage = function(img) {
+      ctx.drawImage(img, 0, 0, caseSize.w, caseSize.h);
+    };
+    
+    var getNumber = function() {
+      return $('.number', container).text() || 0;
+    };
+    var setNumber = function(n) {
+      if(!n) {
+        n=0;
+        container.addClass('empty');
+      }
+      else
+        container.removeClass('empty');
+    
+      $('.number', container).attr('value', n).text(n);
+    };
+    
+    return {
+      init: function(type) {
+        var properties = types.ToolProperties[type];
+        drawImage(properties.icon);
+        return this;
+      },
+      number: function(n) {
+        setNumber(n);
+        return this;
+      },
+      decr: function() {
+        var val = getNumber();
+        setNumber((--val<=0) ? 0 : val);
+        return this;
+      },
+      incr: function() {
+        setNumber(getNumber()+1);
+        return this;
+      }
+    }
+  };
+  
+  var Case = lta.Case = function(arg) {
+    
+    var ctx, node;
+    
+    if(!arg.fillRect) {
+      node = arg;
+      ctx = node[0].getContext('2d');
+    }
+    else {
+      ctx = arg;
+      node = $(ctx.canvas);
+    }
     
     var style = function(style) {
       ctx.fillStyle = style;
@@ -58,6 +132,10 @@
     
     var rectAll = function() {
       ctx.fillRect(0, 0, caseSize.w, caseSize.h);
+    };
+    
+    var drawImage = function(img) {
+      ctx.drawImage(img, 0, 0, caseSize.w, caseSize.h);
     };
     
     var empty = function(){
@@ -71,6 +149,15 @@
       },
       hoverout: function() {
         node.removeClass('hover');
+      },
+      tool: function(type, orientation) {
+        if(typeof(orientation)=='undefined') orientation = types.Orientation.RIGHT;
+        var properties = types.ToolProperties[type];
+        empty();
+        ctx.save();
+        ctx.rotate(types.Orientation.degre(orientation));
+        drawImage(properties.icon);
+        ctx.restore();
       },
       empty: empty,
       wall: function(){
@@ -106,59 +193,23 @@
     }
     
     var parseLevel = function(data) {
-      var grid = [];
-      var caseSplit = data.split(/[;\n]/);
-      console.log('case length = '+caseSplit.length);
-      for(var c in caseSplit) {
-       var caseObj = {};
-        var caseStr = $.trim(caseSplit[c]).toUpperCase();
-        if(caseStr.match("^BOMB")) {
-          caseObj = { mapObject: types.MapObject.BOMB };
-        }
-        else if(caseStr.match("^RECEPTOR")) {
-          caseObj = { mapObject: types.MapObject.RECEPTOR };
-          caseStr = caseStr.substring("RECEPTOR".length);
-          var args = caseStr.split(',');
-          for(var a in args) {
-            var arg = $.trim(args[a]).toUpperCase();
-            for(var color in types.Color) {
-              if(arg==color) {
-                caseObj.color = types.Color[color];
-                break;
-              }
-            }
-          }
-        }
-        else if(caseStr.match("^LASER")) {
-          caseObj = { mapObject: types.MapObject.LASER };
-          caseStr = caseStr.substring("LASER".length);
-          var args = caseStr.split(',');
-          for(var a in args) {
-            var arg = $.trim(args[a]).toUpperCase();
-            var found = false;
-            for(var color in types.Color) {
-              if(arg==color) {
-                caseObj.color = types.Color[color];
-                found = true;
-                break;
-              }
-            }
-            if(!found) {
-              for(var o in types.Orientation) {
-                if(arg==o) {
-                  caseObj.orientation = types.Orientation[o];
-                  break;
-                }
-              }
-            }
-          }
-        }
-        else if(caseStr.match("^WALL")) {
-          caseObj = { mapObject: types.MapObject.WALL };
-        }
-        grid.push(caseObj);
+      var appendScript = 'for(var v in types.Orientation) this[v]=types.Orientation[v];'+
+      'for(var v in types.Color) this[v]=types.Color[v];'+
+      'for(var v in types.ToolType) this[v]=types.ToolType[v];'+
+      'var bomb=function(){ return { mapObject: types.MapObject.BOMB } };'+
+      'var receptor=function(c){ return { mapObject: types.MapObject.RECEPTOR, color: c } };'+
+      'var laser=function(c,o){ return { mapObject: types.MapObject.LASER, color: c, orientation: o } };'+
+      'var wall=function(){ return { mapObject: types.MapObject.WALL } };';
+      
+      var obj;
+      try {
+        obj = eval(appendScript+'('+data+')');
       }
-      return grid;
+      catch(e) {
+        console.log(e.message);
+        return {};
+      }
+      return obj;
     };
     
     getGrid = function(level, callback) {
@@ -178,6 +229,7 @@
   var GameGrid = lta.GameGrid = function() {
     
     var grid = [];
+    var tools;
     var casesNode = [];
     var cases = [];
     
@@ -201,9 +253,7 @@
         dragging = $(dragging);
         if(dragging.is('.toolObjectContainer')) {
           new Case(ctx).drop(dragging);
-          
-          var number = $('.number', dragging);
-          number.text(number.text()-1);
+          new PanelObject(dragging).decr();
         }
       })
     };
@@ -213,8 +263,10 @@
       start: function(level) {       
         var game = $('#game');
         game.hide();
-        Level.getGrid(level, function(g){
-          grid = g;
+        Level.getGrid(level, function(lvl){
+          console.log(lvl);
+          grid = lvl.grid;
+          tools = lvl.tools;
           var i = 0;
           for(var y=0; y<gridSize.h; ++y) {
             for(var x=0; x<gridSize.w; ++x) {
@@ -240,7 +292,21 @@
               ++i;
             }
           }
+          
+          $('#game .gamePanel .toolObjectContainer').hide().empty();
+          /*
+          $('#game .gamePanel .toolObjectContainer').each(function(i){
+            new PanelObject($(this)).init(i).number(2);
+          });
+          */
+          var i = 0;
+          for(var t in tools) {
+            var tool = tools[t];
+            new PanelObject($('#game .gamePanel .toolObjectContainer').eq(i++)).init(tool.type).number(tool.number);
+          }
+          
           game.show();
+          $(window).resize();
         });
       },
       
@@ -261,8 +327,6 @@
   
   
   var Game = lta.Game = function() {
-    
-    var toolObjectSize = {};
     
     var getCaseNodeByPosition = function(pageX, pageY) {
       var gameGrid = $('#game .gameGrid');
@@ -293,7 +357,7 @@
         
         if(node.is('.toolObjectContainer')) {
           
-          if($('.number', node).text()==0) return;
+          if($('canvas', node).size()==0 || $('.number', node).text()==0) return;
           
           e.preventDefault();
           node.addClass('dragging');
@@ -382,10 +446,9 @@
         
         toolObjectSize.w = toolObjectSize.h = Math.floor(width / 7);
         
-        var margin = 5;
         
         for(var i=0; i<7; ++i) {
-          var tool = $('<div class="toolObjectContainer"><div class="number">'+Math.floor(Math.random()*5)+'</div><canvas class="toolObject" width="'+(toolObjectSize.w-2*margin)+'" height="'+(toolObjectSize.h-2*margin)+'"></canvas></div>');
+          var tool = $('<div class="toolObjectContainer"></div>');
           $('#game .gamePanel').append(tool);
         }
         
@@ -400,6 +463,7 @@
       start: function(level) {
         if(!level) level=1;
         GameGrid.start(level);
+        $(window).resize();
       }
     }
   }();

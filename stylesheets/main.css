@@ -26,6 +26,10 @@
   background: #222;
 }
 
+#game .gamePanel .toolObjectContainer.empty {
+  opacity: 0.5;
+}
+
 #game .gamePanel .toolObjectContainer .number {
   position: absolute;
   right: 5px;

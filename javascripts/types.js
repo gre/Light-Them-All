@@ -21,16 +21,21 @@
     },
     prev: function(o){
       return (o-1)%8;
+    },
+    degre: function(o) {
+      return (3-o) * Math.PI / 4;
     }
   };
   
   types.ToolType = { SIMPLE: 0, DOUBLE: 1, CONE: 2, QUAD: 3, REFRACTOR: 4, TRIANGLE: 5, SPLITER: 6 };
   
-  types.Tool = [];
+  types.ToolProperties = [];
     
   var toolMaker = function(type) {
     
-    this.icon = 'images/tool_'+type+'.png';
+    this.icon = new Image();
+    this.icon.src = 'images/tool/'+(type.toLowerCase())+'.png';
+    
     
     this.type = type;
     
@@ -215,6 +220,6 @@
   };
   
   for(var t in types.ToolType)
-    types.Tool[types.ToolType[t]] = new toolMaker(t);
+    types.ToolProperties[types.ToolType[t]] = new toolMaker(t);
   
 }());
