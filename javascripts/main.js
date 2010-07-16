@@ -264,7 +264,7 @@
       getCaseNode: getCaseNode,
       start: function(level) {       
         var game = $('#game');
-        game.hide();
+        
         Level.getGrid(level, function(lvl){
           console.log(lvl);
           grid = lvl.grid;
@@ -312,7 +312,6 @@
             new PanelObject($('#game .gamePanel .toolObjectContainer').eq(i++)).init(tool.type).number(tool.number);
           }
           
-          game.show();
           $(window).resize();
         });
       },
@@ -450,14 +449,15 @@
         
         var gameGrid = $('#game .gameGrid').width(width).height(height)
         $('canvas.lasers, .cases', gameGrid).width(width).height(height);
+        $('#game .gamePanel').width(width);
         
         GameGrid.init();
-        
         
         
         $(window).resize(function(){
           gameGrid.css('margin', '0px auto');
           var marginTopBottom = Math.floor(($(window).height() - $('#play').height())/2);
+          if(marginTopBottom<0) marginTopBottom = 0;
           gameGrid.css('margin', marginTopBottom+'px auto');
         }).resize();
         bindEvents();
@@ -478,11 +478,13 @@
         g_width = $(window).width();
         if(g_width<480) g_width = 320;
         else g_width = 480;
+        
         Game.init();
+        Game.start();
         
         $(document).ready(function(e){
         $('#play').bind('pageAnimationEnd', function(event, info){
-          Game.start();
+          //Game.start();
         })
     });
       }

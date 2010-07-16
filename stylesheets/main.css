@@ -1,4 +1,8 @@
 
+body .current {
+  height: 100%;
+}
+
 #game .gameGrid {
   position: relative;
   margin: 0 auto;
@@ -22,7 +26,7 @@
 }
 
 #game .gamePanel {
-  text-align: center;
+  margin: 0 auto;
   background: #222;
 }
 
