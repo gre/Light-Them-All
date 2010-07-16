@@ -1,6 +1,8 @@
-
-body .current {
-  height: 100%;
+audio {
+  display: none;
+  position: absolute;
+  top: -500px;
+  left: -500px;
 }
 
 #game .gameGrid {
