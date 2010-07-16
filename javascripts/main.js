@@ -51,6 +51,17 @@
     }
   }();
   
+  var Sound = function(node) {
+    var player =  $(node).clone()[0];
+    
+    return {
+      play: function() {
+        player.play();
+        return this;
+      }
+    }
+  };
+  
   var PanelObject = function(arg) {
     var ctx, node, container;
     
@@ -93,9 +104,18 @@
     };
     
     return {
+      type: function(t) {
+        if(typeof(t)!='undefined') 
+          this.init(t);
+        return node.attr('toolType');
+      },
+      node: function() {
+        return node;
+      },
       init: function(type) {
         var properties = types.ToolProperties[type];
         drawImage(properties.icon);
+        node.attr('toolType', type);
         return this;
       },
       number: function(n) {
@@ -145,6 +165,9 @@
     };
     
     return {
+      node: function() {
+        return node;
+      },
       hoverin: function() {
         node.addClass('hover');
       },
@@ -207,7 +230,6 @@
         obj = eval(appendScript+'('+data+')');
       }
       catch(e) {
-        console.log(e.message);
         return {};
       }
       return obj;
@@ -256,6 +278,7 @@
         if(dragging.is('.toolObjectContainer')) {
           new Case(ctx).drop(dragging);
           new PanelObject(dragging).decr();
+          new Sound('#audio_drop').play();
         }
       })
     };
@@ -266,7 +289,6 @@
         var game = $('#game');
         
         Level.getGrid(level, function(lvl){
-          console.log(lvl);
           grid = lvl.grid;
           tools = lvl.tools;
           var i = 0;
@@ -361,34 +383,30 @@
         var node = $(e.target);
         
         if(node.parent().is('.toolObjectContainer')) node = node.parent();
-        
         if(node.is('.toolObjectContainer')) {
-          
           if($('canvas', node).size()==0 || $('.number', node).text()==0) return;
-          
-          e.preventDefault();
-          node.addClass('dragging');
-          var dragHelper = $('<div id="dragHelper"></div>').hide().append($('canvas', node).clone()).css({
+          var draggingPanelObj = new PanelObject($('canvas', node));
+          var dragHelper = $('<div id="dragHelper"></div>').hide().append(new PanelObject($('canvas', node).clone()).init(draggingPanelObj.type()).node()).css({
             position: 'absolute',
             width: toolObjectSize.w+'px',
             height: toolObjectSize.h+'px',
             zIndex: 20,
             background: 'rgba(255,255,255,0.5)'
           });
+          node.addClass('dragging');
           $('#game').append(dragHelper);
+          e.preventDefault();
         }
         
       });
       
       Event.touchend(function(e){
-      
         var dragging = $('#game .toolObjectContainer.dragging');
         var dragHelper = $('#dragHelper');
         if(dragging.size()>0) {
           dragging.removeClass('dragging');
           dragging.trigger('dragend');
           dragHelper.remove();
-          
           $('#game .case.draghover').removeClass('draghover').trigger('draghoverout').trigger('dropped', dragging);
         }
       });
@@ -396,13 +414,8 @@
       Event.touchmove(function(e) {
         var dragging = $('#game .toolObjectContainer.dragging');
         var dragHelper = $('#dragHelper');
-        
         if(dragging.size()>0) {
-        
-          //e.preventDefault();
-          
           var x, y;
-          
           if(e.type=='touchmove') {
             x = e.originalEvent.touches[0].pageX;
             y = e.originalEvent.touches[0].pageY;
@@ -414,7 +427,6 @@
           
           var left = Math.floor(x-toolObjectSize.w/2);
           var top = Math.floor(y-toolObjectSize.h/2);
-          
           dragHelper.show().css({
             top: top+'px',
             left: left+'px'
@@ -452,7 +464,6 @@
         $('#game .gamePanel').width(width);
         
         GameGrid.init();
-        
         
         $(window).resize(function(){
           gameGrid.css('margin', '0px auto');

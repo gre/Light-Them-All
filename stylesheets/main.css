@@ -52,14 +52,13 @@ body .current {
 #game .gamePanel .toolObjectContainer {
   padding: 5px;
   display: inline-block;
-  background: #111;
+  background: #222;
   position: relative;
 }
 #game .gamePanel .toolObjectContainer:nth-child(2n) {
-  background: #333;
+  background: #444;
 }
 #game .gamePanel .toolObject {
-  background: #555;
 }
 
 #game .gamePanel .toolObjectContainer.dragging {
