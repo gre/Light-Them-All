@@ -8,7 +8,8 @@
   
   var types = lta.types;
   
-    
+  var g_width;
+  
   var toolObjectSize = {};
   var caseSize = {};
   var gridSize = { w: 8, h: 8 };
@@ -74,7 +75,7 @@
     }
     
     var drawImage = function(img) {
-      ctx.drawImage(img, 0, 0, caseSize.w, caseSize.h);
+      ctx.drawImage(img, 0, 0, toolObjectSize.w, toolObjectSize.h);
     };
     
     var getNumber = function() {
@@ -226,6 +227,7 @@
     }
   }();
   
+  
   var GameGrid = lta.GameGrid = function() {
     
     var grid = [];
@@ -288,17 +290,22 @@
                 default:
                   new Case(ctx).empty();
               }
-              
               ++i;
             }
           }
           
           $('#game .gamePanel .toolObjectContainer').hide().empty();
-          /*
-          $('#game .gamePanel .toolObjectContainer').each(function(i){
-            new PanelObject($(this)).init(i).number(2);
-          });
-          */
+          
+          var size = Math.floor(g_width / tools.length);
+          if(size>128) size = 128;
+          toolObjectSize.w = toolObjectSize.h = size;
+                  
+          $('#game .gamePanel').empty();
+          for(var i=0; i<tools.length; ++i) {
+            var tool = $('<div class="toolObjectContainer"></div>');
+            $('#game .gamePanel').append(tool);
+          }
+          
           var i = 0;
           for(var t in tools) {
             var tool = tools[t];
@@ -310,7 +317,8 @@
         });
       },
       
-      init: function(width) {
+      init: function() {
+        var width = g_width;
         var gameGrid = $('#game .gameGrid');
         var appendTo = $('.cases', gameGrid).empty();
         for(var y=0; y<gridSize.h; ++y) {
@@ -433,7 +441,8 @@
     };
     
     return {
-      init: function(width) {
+      init: function() {
+        var width = g_width;
         var size = Math.floor(width/gridSize.w);
         width = gridSize.w*size;
         var height = gridSize.h*size;
@@ -442,15 +451,9 @@
         var gameGrid = $('#game .gameGrid').width(width).height(height)
         $('canvas.lasers, .cases', gameGrid).width(width).height(height);
         
-        GameGrid.init(width);
-        
-        toolObjectSize.w = toolObjectSize.h = Math.floor(width / 7);
+        GameGrid.init();
         
         
-        for(var i=0; i<7; ++i) {
-          var tool = $('<div class="toolObjectContainer"></div>');
-          $('#game .gamePanel').append(tool);
-        }
         
         $(window).resize(function(){
           gameGrid.css('margin', '0px auto');
@@ -470,14 +473,12 @@
   
   var Main = lta.Main = function(){
     
-    var g_width;
-    
     return {
       init: function(){
         g_width = $(window).width();
         if(g_width<480) g_width = 320;
         else g_width = 480;
-        Game.init(g_width);
+        Game.init();
         
         $(document).ready(function(e){
         $('#play').bind('pageAnimationEnd', function(event, info){
