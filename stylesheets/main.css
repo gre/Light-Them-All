@@ -33,7 +33,7 @@ audio {
 }
 
 #game .gamePanel .toolObjectContainer.empty {
-  opacity: 0.5;
+  opacity: 0.2;
 }
 
 #game .gamePanel .toolObjectContainer .number {

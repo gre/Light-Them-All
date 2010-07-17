@@ -202,10 +202,6 @@
       laser: function(color, orientation){
         style('rgb(100,100,200)');
         rectAll();
-      },
-      drop: function(dragging) {
-        style('black');
-        ctx.fillRect(caseSize.w/4, caseSize.h/4, caseSize.w/2, caseSize.h/2);
       }
     }
   };
@@ -276,7 +272,9 @@
       node.bind('dropped', function(e, dragging) {
         dragging = $(dragging);
         if(dragging.is('.toolObjectContainer')) {
-          new Case(ctx).drop(dragging);
+                    
+          new Case(ctx).tool($('canvas', dragging).attr('tooltype'));
+          
           new PanelObject(dragging).decr();
           new Sound('#audio_drop').play();
         }
