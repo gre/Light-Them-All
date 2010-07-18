@@ -107,7 +107,7 @@
       type: function(t) {
         if(typeof(t)!='undefined') 
           this.init(t);
-        return node.attr('toolType');
+        return node.attr('tooltype');
       },
       node: function() {
         return node;
@@ -155,8 +155,10 @@
       ctx.fillRect(0, 0, caseSize.w, caseSize.h);
     };
     
-    var drawImage = function(img) {
-      ctx.drawImage(img, 0, 0, caseSize.w, caseSize.h);
+    var drawImage = function(img, x, y) {
+      if(!x) x=0;
+      if(!y) y=0;
+      ctx.drawImage(img, x, y, caseSize.w, caseSize.h);
     };
     
     var empty = function(){
@@ -164,42 +166,92 @@
       rectAll();
     };
     
+    var role = function(role) {
+      if(typeof(tooltype)!="undefined")
+        node.attr("role", role);
+      return node.attr("role");
+    }
+    var orientation = function(o) {
+      if(typeof(o)!="undefined")
+        node.attr("orientation", o);
+      return node.attr("orientation");
+    }
+    var tooltype = function(t) {
+      if(typeof(t)!="undefined")
+        node.attr("tooltype", t);
+      return node.attr("tooltype");
+    }
+    var color = function(c) {
+      if(typeof(c)!="undefined")
+        node.attr("color", c);
+      return node.attr("color");
+    }
+    
     return {
       node: function() {
         return node;
       },
+      role: role,
+      orientation: orientation,
+      color: color,
+      tooltype: tooltype,
       hoverin: function() {
         node.addClass('hover');
       },
       hoverout: function() {
         node.removeClass('hover');
       },
-      tool: function(type, orientation) {
-        if(typeof(orientation)=='undefined') orientation = types.Orientation.RIGHT;
-        var properties = types.ToolProperties[type];
+      /**
+        * type : tool type
+        * o : orientation
+        */
+      tool: function(type, o) {
         empty();
+        if(typeof(o)=='undefined') o = types.Orientation.RIGHT;
+        var properties = types.ToolProperties[type];
+        role('tool');
+        tooltype(type);
+        orientation(o);
+        console.log(types.Orientation.degre(o));
         ctx.save();
-        ctx.rotate(types.Orientation.degre(orientation));
-        drawImage(properties.icon);
+        ctx.translate(caseSize.w/2, caseSize.h/2);
+        ctx.rotate(types.Orientation.degre(o));
+        drawImage(properties.icon, -caseSize.w/2, -caseSize.h/2);
         ctx.restore();
       },
-      empty: empty,
+      turnLeft: function() {
+        this.tool(tooltype(), types.Orientation.next(orientation()));
+      },
+      turnRight: function() {
+        this.tool(tooltype(), types.Orientation.prev(orientation()));
+      },
+      empty: function() {
+        role('empty');
+        empty();
+      },
       wall: function(){
+        role('wall');
         style('rgb(100,100,100)');
         rectAll();
       },
       bomb: function(){
+        role('bomb');
         style('rgb(100,0,0)');
         rectAll();
       },
-      receptor: function(color){
+      receptor: function(c){
+        role('receptor');
+        color(c);
         empty();
         style('rgb(0,150,0)');
         ctx.beginPath();
         ctx.arc(caseSize.w/2, caseSize.h/2, caseSize.h/3, 0, Math.PI*2, true);
         ctx.fill();
       },
-      laser: function(color, orientation){
+      laser: function(c, o){
+        role('laser');
+        color(c);
+        orientation(o);
         style('rgb(100,100,200)');
         rectAll();
       }
@@ -263,22 +315,38 @@
     var bindCase = function(node) {
       var ctx = node[0].getContext('2d');
       var fillStyle;
-      node.bind('draghoverin', function(){
-        new Case(ctx).hoverin();
+      node.bind('draghoverin', function(e, dragging){
+        var c = new Case(ctx);
+        if(c.role()=='empty') {
+          c.hoverin();
+          $('#dragHelper').addClass('overEmptyCase');
+        }
+        else
+          $('#dragHelper').removeClass('overEmptyCase');
       });
-      node.bind('draghoverout', function(){
-        new Case(ctx).hoverout();
+      node.bind('draghoverout', function(e, dragging){
+        var c = new Case(ctx);
+        if(c.role()=='empty') {
+          c.hoverout();
+        }
       });
       node.bind('dropped', function(e, dragging) {
         dragging = $(dragging);
         if(dragging.is('.toolObjectContainer')) {
-                    
-          new Case(ctx).tool($('canvas', dragging).attr('tooltype'));
-          
+          var c = new Case(ctx);
+          if(c.role()!='empty') return;
+          c.tool($('canvas', dragging).attr('tooltype'));
           new PanelObject(dragging).decr();
           new Sound('#audio_drop').play();
         }
-      })
+      });
+      node.bind('tap', function(e) {
+        var c = new Case(ctx);
+        if(c.role()=='tool') {
+          c.turnRight();
+          new Sound('#audio_turn').play();
+        }
+      });
     };
     
     return {
@@ -370,15 +438,9 @@
     
     var bindEvents = function() {
       
-      /*
-      $(document).bind('mousestart mousemove mouseend drag dragstart dragend pinch pinchstart tap doubletap swipe swipeleft swiperight touchstart touchmove touchend taphold tapstart tapcancel',
-      function(e){
-        console.log(e.type);
-      });
-      */
-      
       Event.touchstart(function(e) {
         var node = $(e.target);
+        node.addClass('touchStartOn');
         
         if(node.parent().is('.toolObjectContainer')) node = node.parent();
         if(node.is('.toolObjectContainer')) {
@@ -387,10 +449,9 @@
           var dragHelper = $('<div id="dragHelper"></div>').hide().append(new PanelObject($('canvas', node).clone()).init(draggingPanelObj.type()).node()).css({
             position: 'absolute',
             width: toolObjectSize.w+'px',
-            height: toolObjectSize.h+'px',
-            zIndex: 20,
-            background: 'rgba(255,255,255,0.5)'
+            height: toolObjectSize.h+'px'
           });
+          
           node.addClass('dragging');
           $('#game').append(dragHelper);
           e.preventDefault();
@@ -401,11 +462,35 @@
       Event.touchend(function(e){
         var dragging = $('#game .toolObjectContainer.dragging');
         var dragHelper = $('#dragHelper');
+        var x, y;
+        if(e.type=='touchmove') {
+          x = e.originalEvent.touches[0].pageX;
+          y = e.originalEvent.touches[0].pageY;
+        }
+        else {
+          x = e.pageX;
+          y = e.pageY;
+        }
+        
         if(dragging.size()>0) {
           dragging.removeClass('dragging');
           dragging.trigger('dragend');
           dragHelper.remove();
           $('#game .case.draghover').removeClass('draghover').trigger('draghoverout').trigger('dropped', dragging);
+        }
+        
+        var node = $('.touchStartOn');
+        if(node.size()>0) {
+          if($(e.target).is('.touchStartOn')) {
+            // TOUCH
+            if(dragging.size()==0) {
+              var caseNode = getCaseNodeByPosition(x, y);
+              if(caseNode) {
+                caseNode.trigger('tap');
+              }
+            }
+          }
+          node.removeClass('touchStartOn');          
         }
       });
       
@@ -432,14 +517,18 @@
           
           var caseNode = getCaseNodeByPosition(x, y);
           if(caseNode) {
+            $('#dragHelper').addClass('overGrid');
             if(!caseNode.is('.draghover')) {
               $(caseNode).addClass('draghover');
-              caseNode.trigger('draghoverin');
+              caseNode.trigger('draghoverin', dragging);
             }
             caseNode.removeClass('draghover');
           }
+          else {
+            $('#dragHelper').removeClass('overGrid');
+          }
           $('#game .case.draghover').each(function(){
-            $(this).removeClass('draghover').trigger('draghoverout');
+            $(this).removeClass('draghover').trigger('draghoverout', dragging);
           });
           if(caseNode)
             caseNode.addClass('draghover');

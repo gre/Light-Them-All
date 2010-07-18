@@ -67,10 +67,24 @@ audio {
   background: #fff;
 }
 
+
 #game .gameGrid .cases .case {
   display: inline-block;
 }
 
 #game .case.hover {
   opacity: 0.5;
+}
+
+#dragHelper {
+  z-index: 20;
+  background: transparent;
+}
+
+#dragHelper.overGrid.overEmptyCase {
+  background: rgba(255,255,255,0.5);
+}
+
+#dragHelper.overGrid {
+  background: rgba(255,100,100,0.5);
 }

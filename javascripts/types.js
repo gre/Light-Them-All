@@ -17,10 +17,10 @@
   
   types.Orientation = { TOPLEFT: 0, TOP: 1, TOPRIGHT: 2, RIGHT: 3, BOTTOMRIGHT: 4, BOTTOM: 5, BOTTOMLEFT: 6, LEFT: 7,
     next: function(o){
-      return (o+1)%8;
+      return o==7 ? 0 : parseInt(o)+1;
     },
     prev: function(o){
-      return (o-1)%8;
+      return o==0 ? 7 : parseInt(o)-1;
     },
     degre: function(o) {
       return (3-o) * Math.PI / 4;
