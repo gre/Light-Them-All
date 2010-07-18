@@ -64,14 +64,14 @@
   
   var PanelObject = function(arg) {
     var ctx, node, container;
-    
+    //console.log(arg)
     if(!arg.fillRect) {
       node = arg;
       if(node.is('.toolObjectContainer')) {
         var canvas = $('canvas', node);
         if(canvas.size()==0) {
           var number = $('<div class="number"></div>');
-          var canvas = $('<canvas class="toolObject" />').attr('width', toolObjectSize.w-10).attr('height', toolObjectSize.h-10);
+          var canvas = $('<canvas class="toolObject"></canvas>').attr('width', toolObjectSize.w-10).attr('height', toolObjectSize.h-10);
           node.show().empty().append(number).append(canvas);
         }
         container = node;
@@ -212,7 +212,6 @@
         role('tool');
         tooltype(type);
         orientation(o);
-        console.log(types.Orientation.degre(o));
         ctx.save();
         ctx.translate(caseSize.w/2, caseSize.h/2);
         ctx.rotate(types.Orientation.degre(o));
@@ -340,7 +339,7 @@
           new Sound('#audio_drop').play();
         }
       });
-      node.bind('tap', function(e) {
+      node.bind('touch', function(e) {
         var c = new Case(ctx);
         if(c.role()=='tool') {
           c.turnRight();
@@ -440,8 +439,7 @@
       
       Event.touchstart(function(e) {
         var node = $(e.target);
-        node.addClass('touchStartOn');
-        
+          
         if(node.parent().is('.toolObjectContainer')) node = node.parent();
         if(node.is('.toolObjectContainer')) {
           if($('canvas', node).size()==0 || $('.number', node).text()==0) return;
@@ -460,17 +458,9 @@
       });
       
       Event.touchend(function(e){
+        var target = $(e.target);
         var dragging = $('#game .toolObjectContainer.dragging');
         var dragHelper = $('#dragHelper');
-        var x, y;
-        if(e.type=='touchmove') {
-          x = e.originalEvent.touches[0].pageX;
-          y = e.originalEvent.touches[0].pageY;
-        }
-        else {
-          x = e.pageX;
-          y = e.pageY;
-        }
         
         if(dragging.size()>0) {
           dragging.removeClass('dragging');
@@ -479,19 +469,15 @@
           $('#game .case.draghover').removeClass('draghover').trigger('draghoverout').trigger('dropped', dragging);
         }
         
-        var node = $('.touchStartOn');
-        if(node.size()>0) {
-          if($(e.target).is('.touchStartOn')) {
+        /*
             // TOUCH
             if(dragging.size()==0) {
               var caseNode = getCaseNodeByPosition(x, y);
               if(caseNode) {
-                caseNode.trigger('tap');
+                caseNode.trigger('touch');
               }
             }
-          }
-          node.removeClass('touchStartOn');          
-        }
+        */
       });
       
       Event.touchmove(function(e) {
@@ -578,11 +564,10 @@
         else g_width = 480;
         
         Game.init();
-        Game.start();
         
         $(document).ready(function(e){
         $('#play').bind('pageAnimationEnd', function(event, info){
-          //Game.start();
+          Game.start();
         })
     });
       }
