@@ -72,6 +72,14 @@ audio {
   display: inline-block;
 }
 
+#game .gameGrid .cases .case.touching {
+  opacity: 0.8;
+}
+  
+#game .gameGrid .cases .case.dragging {
+  opacity: 0.3;
+}
+
 #game .case.hover {
   opacity: 0.5;
 }

@@ -19,7 +19,7 @@
     var useTouch = hasTouch && !isChrome;
     var target = document;
     
-    var touchstart, touchmove, touchend;
+    var touchstart, touchmove, touchend, touch;
     
     if(useTouch) {
       touchstart = function(fn) {
@@ -31,6 +31,7 @@
       touchend = function(fn) {
         $(target).bind('touchend', fn);
       };
+      touch = function(){};
     }
     else {
       touchstart = function(fn) {
@@ -42,12 +43,16 @@
       touchend = function(fn) {
         $(document).bind('mouseup', fn);
       };
+      touch = function(fn) {
+        $(document).bind('click', fn);
+      };
     }
         
     return {
       touchstart: touchstart,
       touchmove: touchmove,
-      touchend: touchend
+      touchend: touchend,
+      touch: touch
     }
   }();
   
@@ -84,9 +89,10 @@
       node = $(ctx.canvas);
       container = node.parents('.toolObjectContainer:first');
     }
-    
-    var drawImage = function(img) {
-      ctx.drawImage(img, 0, 0, toolObjectSize.w, toolObjectSize.h);
+    var drawImage = function(img, x, y) {
+      if(!x) x=0;
+      if(!y) y=0;
+      ctx.drawImage(img, x, y, toolObjectSize.w, toolObjectSize.h);
     };
     
     var getNumber = function() {
@@ -112,9 +118,14 @@
       node: function() {
         return node;
       },
-      init: function(type) {
+      init: function(type, o) {
+        if(typeof(o)=='undefined') o = types.Orientation.RIGHT;
         var properties = types.ToolProperties[type];
-        drawImage(properties.icon);
+        ctx.save();
+        ctx.translate(toolObjectSize.w/2, toolObjectSize.h/2);
+        ctx.rotate(types.Orientation.degre(o));
+        drawImage(properties.icon, -toolObjectSize.w/2, -toolObjectSize.h/2);
+        ctx.restore();
         node.attr('toolType', type);
         return this;
       },
@@ -174,7 +185,7 @@
     var orientation = function(o) {
       if(typeof(o)!="undefined")
         node.attr("orientation", o);
-      return node.attr("orientation");
+      return node.attr("orientation") || types.Orientation.RIGHT;
     }
     var tooltype = function(t) {
       if(typeof(t)!="undefined")
@@ -207,7 +218,7 @@
         */
       tool: function(type, o) {
         empty();
-        if(typeof(o)=='undefined') o = types.Orientation.RIGHT;
+        if(typeof(o)=='undefined') o = orientation();
         var properties = types.ToolProperties[type];
         role('tool');
         tooltype(type);
@@ -338,6 +349,15 @@
           new PanelObject(dragging).decr();
           new Sound('#audio_drop').play();
         }
+        else if(dragging.is('.case')) {
+          var c = new Case(ctx);
+          if(c.role()!='empty') return;
+          var draggingCase = new Case(dragging);
+          c.orientation(draggingCase.orientation());
+          c.tool(draggingCase.tooltype());
+          draggingCase.empty();
+          new Sound('#audio_drop').play();
+        }
       });
       node.bind('touch', function(e) {
         var c = new Case(ctx);
@@ -437,6 +457,13 @@
     
     var bindEvents = function() {
       
+      Event.touch(function(e){
+        var node = $(e.target);
+        if(node.is('.case')) {
+          node.trigger('touch');
+        }
+      });
+      
       Event.touchstart(function(e) {
         var node = $(e.target);
           
@@ -454,54 +481,65 @@
           $('#game').append(dragHelper);
           e.preventDefault();
         }
-        
+        else if(node.is('.case')) {
+          var c = new Case(node);
+          if(c.role()=='tool') {
+            node.addClass('touching');
+            e.preventDefault();
+          }
+        }
       });
       
       Event.touchend(function(e){
         var target = $(e.target);
-        var dragging = $('#game .toolObjectContainer.dragging');
+        var dragging = $('#game .dragging');
         var dragHelper = $('#dragHelper');
-        
         if(dragging.size()>0) {
           dragging.removeClass('dragging');
           dragging.trigger('dragend');
           dragHelper.remove();
           $('#game .case.draghover').removeClass('draghover').trigger('draghoverout').trigger('dropped', dragging);
         }
-        
-        /*
-            // TOUCH
-            if(dragging.size()==0) {
-              var caseNode = getCaseNodeByPosition(x, y);
-              if(caseNode) {
-                caseNode.trigger('touch');
-              }
-            }
-        */
+        $('#game .case.touching').removeClass('touching');
       });
       
       Event.touchmove(function(e) {
-        var dragging = $('#game .toolObjectContainer.dragging');
+        
         var dragHelper = $('#dragHelper');
+        var x, y;
+        if(e.type=='touchmove') {
+          x = e.originalEvent.touches[0].pageX;
+          y = e.originalEvent.touches[0].pageY;
+        }
+        else {
+          x = e.pageX;
+          y = e.pageY;
+        }
+        var caseNode = getCaseNodeByPosition(x, y);
+        
+        if($('#game .touching').size()>0 && caseNode && !caseNode.is('.touching')) {
+          var node = $('#game .touching').removeClass('touching').addClass('dragging');
+          var c = new Case(node);
+          if(c.role()=='tool') {
+            var dragHelper = $('<div id="dragHelper"></div>').hide().append(new PanelObject($('<canvas />')).init(c.tooltype(), c.orientation()).node()).css({
+              position: 'absolute',
+              width: toolObjectSize.w+'px',
+              height: toolObjectSize.h+'px'
+            });
+            node.addClass('dragging');
+            $('#game').append(dragHelper);
+          }
+        }
+        
+        var dragging = $('#game .dragging');
+        
         if(dragging.size()>0) {
-          var x, y;
-          if(e.type=='touchmove') {
-            x = e.originalEvent.touches[0].pageX;
-            y = e.originalEvent.touches[0].pageY;
-          }
-          else {
-            x = e.pageX;
-            y = e.pageY;
-          }
-          
           var left = Math.floor(x-toolObjectSize.w/2);
           var top = Math.floor(y-toolObjectSize.h/2);
           dragHelper.show().css({
             top: top+'px',
             left: left+'px'
           });
-          
-          var caseNode = getCaseNodeByPosition(x, y);
           if(caseNode) {
             $('#dragHelper').addClass('overGrid');
             if(!caseNode.is('.draghover')) {
