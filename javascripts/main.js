@@ -195,7 +195,7 @@
     var color = function(c) {
       if(typeof(c)!="undefined")
         node.attr("color", c);
-      return node.attr("color");
+      return node.attr("color") || types.Color.R;
     }
     
     return {
@@ -246,24 +246,42 @@
       },
       bomb: function(){
         role('bomb');
-        style('rgb(100,0,0)');
+        style('rgba(150,0,0,0.5)');
         rectAll();
-      },
-      receptor: function(c){
-        role('receptor');
-        color(c);
-        empty();
-        style('rgb(0,150,0)');
+        style('rgb(150,0,0)');
         ctx.beginPath();
         ctx.arc(caseSize.w/2, caseSize.h/2, caseSize.h/3, 0, Math.PI*2, true);
         ctx.fill();
       },
+      receptor: function(c){
+        if(typeof(c)=='undefined') c = color();
+        empty();
+        role('receptor');
+        color(c);
+        style(types.Color.rgba(c));
+        ctx.beginPath();
+        ctx.arc(caseSize.w/2, caseSize.h/2, caseSize.h/3, 0, Math.PI*2, true);
+        ctx.fill();
+        style('rgba(255,255,255,0.3)');
+        ctx.beginPath();
+        ctx.arc(caseSize.w/2, caseSize.h/2, caseSize.h/4, 0, Math.PI*2, true);
+        ctx.fill();
+      },
       laser: function(c, o){
+        if(typeof(o)=='undefined') o = orientation();
+        if(typeof(c)=='undefined') c = color();
+        empty();
         role('laser');
         color(c);
         orientation(o);
+        ctx.save();
+        ctx.translate(caseSize.w/2, caseSize.h/2);
+        ctx.rotate(types.Orientation.degre(o));
         style('rgb(100,100,200)');
-        rectAll();
+        ctx.fillRect(-caseSize.w/2, -caseSize.h/4, caseSize.w, caseSize.h/2);
+        style('rgba(0,0,0,0.8)');
+        ctx.fillRect(-caseSize.w/2, -caseSize.h/8, caseSize.w/3, caseSize.h/4);
+        ctx.restore();
       }
     }
   };

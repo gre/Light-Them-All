@@ -8,6 +8,38 @@
     },
     filter: function(c1, c2) { 
       return c1 & c2; 
+    },
+    rgba: function(c, alpha, lum) {
+      if(typeof(alpha)=='undefined') alpha=1;
+      if(typeof(lum)=='undefined') lum=511;
+      if(alpha<0) alpha=0;
+      if(alpha>1) alpha=1;
+      
+      var colorOn = 256;
+      var colorOff = 0;
+      var r, g, b;
+      if(c==types.Color.R) {
+        r=colorOn; g=colorOff; b=colorOff;
+      }
+      else if(c==types.Color.G) {
+        r=colorOff; g=colorOn; b=colorOff;
+      }
+      else if(c==types.Color.B) {
+        r=colorOff; g=colorOff; b=colorOn;
+      }
+      else if(c==types.Color.RG) {
+        r=colorOn; g=colorOn; b=colorOff;
+      }
+      else if(c==types.Color.RB) {
+        r=colorOn; g=colorOff; b=colorOn;
+      }
+      else if(c==types.Color.GB) {
+        r=colorOff; g=colorOn; b=colorOn;
+      }
+      else if(c==types.Color.RGB) {
+        r=colorOn; g=colorOn; b=colorOn;
+      }
+      return 'rgba('+r+','+g+','+b+','+alpha+')';
     }
   };
   
