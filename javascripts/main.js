@@ -265,7 +265,7 @@
         ctx.beginPath();
         ctx.arc(caseSize.w/2, caseSize.h/2, caseSize.h/3, 0, Math.PI*2, true);
         ctx.fill();
-        style('rgba(255,255,255,0.3)');
+        style(types.Color.rgba(c,1,400));
         ctx.beginPath();
         ctx.arc(caseSize.w/2, caseSize.h/2, caseSize.h/4, 0, Math.PI*2, true);
         ctx.fill();
@@ -280,10 +280,15 @@
         ctx.save();
         ctx.translate(caseSize.w/2, caseSize.h/2);
         ctx.rotate(types.Orientation.degre(o));
-        style(types.Color.rgba(c,1,100));
+        ctx.shadowBlur = 10;
+        ctx.strokeStyle = types.Color.rgba(c,1,100);
+        ctx.strokeRect(-caseSize.w/2+4, -caseSize.h/4, caseSize.w-8, caseSize.h/2);
+        style(types.Color.rgba(c,1,150));
         ctx.fillRect(-caseSize.w/2+4, -caseSize.h/4, caseSize.w-8, caseSize.h/2);
-        style(types.Color.rgba(c,1,400));
+        style(types.Color.rgba(c,1,350));
         ctx.fillRect(4, -caseSize.h/6, caseSize.w/2-8, caseSize.h/3);
+        style(types.Color.rgba(c,1,400));
+        ctx.fillRect(6, -caseSize.h/6+2, caseSize.w/2-10, caseSize.h/3-4);
         ctx.restore();
       }
     }
@@ -352,9 +357,10 @@
       lasersCanvas.width = lasersCanvas.width;
     }
     var drawLasers = function(lasers) {
+      lasersCtx.lineJoin = 'round';
       lasersCtx.shadowBlur = caseSize.w/2;
       lasersCtx.globalCompositeOperation = 'lighter';
-        lasersCtx.lineWidth = caseSize.w/8;
+      lasersCtx.lineWidth = caseSize.w/8;
       for(var i in lasers) {
         var laser = lasers[i];
         var points = [];
