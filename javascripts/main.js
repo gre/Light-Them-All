@@ -58,7 +58,6 @@
   
   var Sound = function(node) {
     var player =  $(node).clone()[0];
-    
     return {
       play: function() {
         player.play();
@@ -76,7 +75,7 @@
         var canvas = $('canvas', node);
         if(canvas.size()==0) {
           var number = $('<div class="number"></div>');
-          var canvas = $('<canvas class="toolObject"></canvas>').attr('width', toolObjectSize.w-10).attr('height', toolObjectSize.h-10);
+          var canvas = $('<canvas class="toolObject"></canvas>').attr('width', toolObjectSize.w).attr('height', toolObjectSize.h);
           node.show().empty().append(number).append(canvas);
         }
         container = node;
@@ -277,10 +276,10 @@
         ctx.save();
         ctx.translate(caseSize.w/2, caseSize.h/2);
         ctx.rotate(types.Orientation.degre(o));
-        style('rgb(100,100,200)');
-        ctx.fillRect(-caseSize.w/2, -caseSize.h/4, caseSize.w, caseSize.h/2);
-        style('rgba(0,0,0,0.8)');
-        ctx.fillRect(-caseSize.w/2, -caseSize.h/8, caseSize.w/3, caseSize.h/4);
+        style(types.Color.rgba(c,1,100));
+        ctx.fillRect(-caseSize.w/2+2, -caseSize.h/4, caseSize.w-10, caseSize.h/2);
+        style('rgba(255,255,255,0.4)');
+        ctx.fillRect(-2, -caseSize.h/6, caseSize.w/3, caseSize.h/3);
         ctx.restore();
       }
     }
@@ -324,6 +323,47 @@
       getGrid: getGrid
     }
   }();
+  
+  var RayTracer = lta.RayTracer = function() {
+    
+    /// utils
+    var inRange = function(i, a, b) {
+      return i>=a && i<b;
+    };
+    
+    var getNextCase = function(current, moveOrientation) {
+      var x = parseInt(current.attr('x'));
+      var y = parseInt(current.attr('y'));
+      switch(moveOrientation) {
+        case types.Orientation.TOPLEFT: --x; --y; break;
+        case types.Orientation.TOP: --y; break;
+        case types.Orientation.TOPRIGHT: ++x; --y; break;
+        case types.Orientation.RIGHT: ++x; break;
+        case types.Orientation.BOTTOMRIGHT: ++x; ++y; break;
+        case types.Orientation.BOTTOM: ++y; break;
+        case types.Orientation.BOTTOMLEFT: --x; ++y; break;
+        case types.Orientation.LEFT: --x; break;
+      }
+      if(!inRange(x, 0, gridSize.w) || !inRange(y, 0, gridSize.h)) {
+        return null;
+      }
+      else return GameGrid.getCaseNode(x, y);
+    };
+    
+    var traceLaser = function(laser) {
+    
+    };
+    
+    ///
+    
+    return {
+      trace: function() {
+        $('.case[role=laser]').each(function(){
+          traceLaser($(this));
+        });
+      }
+    };
+  };
   
   
   var GameGrid = lta.GameGrid = function() {
@@ -423,8 +463,9 @@
           
           var size = Math.floor(g_width / tools.length);
           if(size>128) size = 128;
+          if(size<caseSize.h) size = caseSize.h;
           toolObjectSize.w = toolObjectSize.h = size;
-                  
+          
           $('#game .gamePanel').empty();
           for(var i=0; i<tools.length; ++i) {
             var tool = $('<div class="toolObjectContainer"></div>');
@@ -448,7 +489,13 @@
         for(var y=0; y<gridSize.h; ++y) {
           for(var x=0; x<gridSize.w; ++x) {
             var i = y*gridSize.w+x;
-            var node = casesNode[i] = $('<canvas class="case" width="'+caseSize.w+'" height="'+caseSize.h+'"></canvas>').appendTo(appendTo);
+            var node = casesNode[i] = $('<canvas class="case"></canvas>')
+                                      .attr('width', caseSize.w)
+                                      .attr('height', caseSize.h)
+                                      .attr('index', i)
+                                      .attr('x', x)
+                                      .attr('y', y)
+                                      .appendTo(appendTo);
             cases[i] = node[0].getContext('2d');
             bindCase(node);
           }
@@ -460,7 +507,7 @@
   
   var Game = lta.Game = function() {
     
-    var getCaseNodeByPosition = function(pageX, pageY) {
+    var getCaseNodeByPosition = function(pageX, pageY) { // TODO : use x and y attr
       var gameGrid = $('#game .gameGrid');
       var offset = gameGrid.offset();
       if(pageX < offset.left || pageX > offset.left+gameGrid.width() 
@@ -522,6 +569,7 @@
       });
       
       Event.touchmove(function(e) {
+        e.preventDefault();
         
         var dragHelper = $('#dragHelper');
         var x, y;
@@ -574,8 +622,6 @@
           });
           if(caseNode)
             caseNode.addClass('draghover');
-          
-          return false;
         }
       });
     };

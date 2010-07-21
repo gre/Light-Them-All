@@ -52,7 +52,7 @@ audio {
 }
 
 #game .gamePanel .toolObjectContainer {
-  padding: 5px;
+  padding: 0px;
   display: inline-block;
   background: #222;
   position: relative;
@@ -90,7 +90,7 @@ audio {
 }
 
 #dragHelper.overGrid.overEmptyCase {
-  background: rgba(255,255,255,0.5);
+  background: rgba(100,255,100,0.5);
 }
 
 #dragHelper.overGrid {

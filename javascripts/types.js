@@ -11,12 +11,14 @@
     },
     rgba: function(c, alpha, lum) {
       if(typeof(alpha)=='undefined') alpha=1;
-      if(typeof(lum)=='undefined') lum=511;
+      if(typeof(lum)=='undefined') lum=255;
       if(alpha<0) alpha=0;
       if(alpha>1) alpha=1;
       
-      var colorOn = 256;
-      var colorOff = 0;
+      var min = function(a,b){ return (a<b ? a : b) };
+      
+      var colorOn = min(255,lum);
+      var colorOff = min(255,lum-colorOn);
       var r, g, b;
       if(c==types.Color.R) {
         r=colorOn; g=colorOff; b=colorOff;
@@ -55,7 +57,7 @@
       return o==0 ? 7 : parseInt(o)-1;
     },
     degre: function(o) {
-      return (3-o) * Math.PI / 4;
+      return (o-3) * Math.PI / 4;
     }
   };
   
