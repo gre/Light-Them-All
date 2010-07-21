@@ -12,7 +12,7 @@ audio {
 }
 
 #game .gameGrid .cases {
-  background: white;
+  background: rgba(255,255,255,0.4);
   position: absolute;
   top: 0;
   left: 0;
@@ -81,7 +81,7 @@ audio {
 }
 
 #game .case.hover {
-  opacity: 0.5;
+  background: rgba(255,255,255,0.8);
 }
 
 #dragHelper {

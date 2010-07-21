@@ -68,7 +68,6 @@
   
   var PanelObject = function(arg) {
     var ctx, node, container;
-    //console.log(arg)
     if(!arg.fillRect) {
       node = arg;
       if(node.is('.toolObjectContainer')) {
@@ -172,8 +171,7 @@
     };
     
     var empty = function(){
-      style('rgb(200,200,200)');
-      rectAll();
+      node[0].width = node[0].width;
     };
     
     var role = function(role) {
@@ -205,6 +203,12 @@
       orientation: orientation,
       color: color,
       tooltype: tooltype,
+      x: function() {
+        return parseInt(node.attr('x'));
+      },
+      y: function() {
+        return parseInt(node.attr('y'));
+      },
       hoverin: function() {
         node.addClass('hover');
       },
@@ -277,9 +281,9 @@
         ctx.translate(caseSize.w/2, caseSize.h/2);
         ctx.rotate(types.Orientation.degre(o));
         style(types.Color.rgba(c,1,100));
-        ctx.fillRect(-caseSize.w/2+2, -caseSize.h/4, caseSize.w-10, caseSize.h/2);
-        style('rgba(255,255,255,0.4)');
-        ctx.fillRect(-2, -caseSize.h/6, caseSize.w/3, caseSize.h/3);
+        ctx.fillRect(-caseSize.w/2+4, -caseSize.h/4, caseSize.w-8, caseSize.h/2);
+        style(types.Color.rgba(c,1,400));
+        ctx.fillRect(4, -caseSize.h/6, caseSize.w/2-8, caseSize.h/3);
         ctx.restore();
       }
     }
@@ -326,6 +330,8 @@
   
   var RayTracer = lta.RayTracer = function() {
     
+    var lasersCanvas, lasersCtx;
+    
     /// utils
     var inRange = function(i, a, b) {
       return i>=a && i<b;
@@ -334,37 +340,103 @@
     var getNextCase = function(current, moveOrientation) {
       var x = parseInt(current.attr('x'));
       var y = parseInt(current.attr('y'));
-      switch(moveOrientation) {
-        case types.Orientation.TOPLEFT: --x; --y; break;
-        case types.Orientation.TOP: --y; break;
-        case types.Orientation.TOPRIGHT: ++x; --y; break;
-        case types.Orientation.RIGHT: ++x; break;
-        case types.Orientation.BOTTOMRIGHT: ++x; ++y; break;
-        case types.Orientation.BOTTOM: ++y; break;
-        case types.Orientation.BOTTOMLEFT: --x; ++y; break;
-        case types.Orientation.LEFT: --x; break;
-      }
-      if(!inRange(x, 0, gridSize.w) || !inRange(y, 0, gridSize.h)) {
+      var nextPos = types.Orientation.move(moveOrientation, x, y);
+      if(!inRange(nextPos.x, 0, gridSize.w) || !inRange(nextPos.y, 0, gridSize.h)) {
         return null;
       }
-      else return GameGrid.getCaseNode(x, y);
+      else return GameGrid.getCaseNode(nextPos.x, nextPos.y);
     };
     
-    var traceLaser = function(laser) {
-    
+    /// Graphical part
+    var resetLasers = function() {
+      lasersCanvas.width = lasersCanvas.width;
+    }
+    var drawLasers = function(lasers) {
+      lasersCtx.shadowBlur = caseSize.w/2;
+      lasersCtx.globalCompositeOperation = 'lighter';
+        lasersCtx.lineWidth = caseSize.w/8;
+      for(var i in lasers) {
+        var laser = lasers[i];
+        var points = [];
+        for(var p in laser.points) {
+          var point = laser.points[p];
+          var role = point.obj.role();
+          var offsetX = role=='empty' && (point.x==0 || point.x==gridSize.w-1) ? 1 : 0.5;
+          var offsetY = role=='empty' && (point.y==0 || point.y==gridSize.h-1) ? 1 : 0.5;
+          points.push({ x: (offsetX+point.x)*caseSize.w, y: (offsetY+point.y)*caseSize.h });
+        }
+        lasersCtx.strokeStyle = types.Color.rgba(laser.color, 1, 250);
+        lasersCtx.shadowColor = types.Color.rgba(laser.color, 1, 300);
+        lasersCtx.beginPath();
+        var first = true;
+        for(var p in points) {
+          var point = points[p];
+          if(first) {
+            first = false;
+            lasersCtx.moveTo(point.x, point.y);
+          }
+          else {
+            lasersCtx.lineTo(point.x, point.y);
+          }
+        }
+        lasersCtx.closePath();
+        lasersCtx.stroke();
+      }
     };
     
-    ///
+    /// Algorithmic part
+    
+    var getCasePos = function(c) {
+      return { x: c.x(), y: c.y(), obj: c };
+    }
+    
+    var traceLaser = function(laserNode) {
+      var lasers = [];
+      
+      var laserCase = new Case(laserNode);
+      var laser = {
+        color: laserCase.color(),
+        points: [getCasePos(laserCase)]
+      };
+      var orientation = laserCase.orientation();
+      var pos;
+      var nextCase = laserCase;
+      var role = "empty";
+      while(nextCase) {
+        var nextCaseNode = getNextCase(nextCase.node(), orientation);
+        nextCase = nextCaseNode ? new Case(nextCaseNode) : null;
+        if(!nextCase) break;
+        if(role=="empty") {
+          pos = getCasePos(nextCase);
+          role = nextCase.role();
+        }
+        else {
+          nextCase = null;
+        }
+      }
+      if(pos) {
+        laser.points.push(pos);
+        lasers.push(laser);
+      }
+      
+      drawLasers(lasers);
+    };
     
     return {
+      init: function() {
+        lasersCanvas = $('#game canvas.lasers')[0];
+        lasersCtx = lasersCanvas.getContext('2d');
+      },
       trace: function() {
+        console.log('retrace lasers');
+        resetLasers();
         $('.case[role=laser]').each(function(){
           traceLaser($(this));
         });
       }
     };
-  };
-  
+  }();
+  $(document).ready(RayTracer.init);
   
   var GameGrid = lta.GameGrid = function() {
     
@@ -416,18 +488,21 @@
           draggingCase.empty();
           new Sound('#audio_drop').play();
         }
+        RayTracer.trace();
       });
       node.bind('touch', function(e) {
         var c = new Case(ctx);
         if(c.role()=='tool') {
           c.turnRight();
           new Sound('#audio_turn').play();
+          RayTracer.trace();
         }
       });
     };
     
     return {
       getCaseNode: getCaseNode,
+      getCase: getCase,
       start: function(level) {       
         var game = $('#game');
         
@@ -458,6 +533,8 @@
               ++i;
             }
           }
+          
+          RayTracer.trace();
           
           $('#game .gamePanel .toolObjectContainer').hide().empty();
           
@@ -635,7 +712,8 @@
         caseSize.w = caseSize.h = size;
         
         var gameGrid = $('#game .gameGrid').width(width).height(height)
-        $('canvas.lasers, .cases', gameGrid).width(width).height(height);
+        $('.cases', gameGrid).width(width).height(height);
+        $('canvas.lasers', gameGrid).attr('width', width).attr('height', height);
         $('#game .gamePanel').width(width);
         
         GameGrid.init();

@@ -19,7 +19,7 @@
       
       var colorOn = min(255,lum);
       var colorOff = min(255,lum-colorOn);
-      var r, g, b;
+      var r=0, g=0, b=0;
       if(c==types.Color.R) {
         r=colorOn; g=colorOff; b=colorOff;
       }
@@ -58,6 +58,24 @@
     },
     degre: function(o) {
       return (o-3) * Math.PI / 4;
+    },
+    move: function(o, x, y) {
+      if(o==types.Orientation.TOPLEFT)
+        return {x: x-1, y: y-1};
+      if(o==types.Orientation.TOP)
+        return {x: x, y: y-1};
+      if(o==types.Orientation.TOPRIGHT)
+        return {x: x+1, y: y-1};
+      if(o==types.Orientation.RIGHT)
+        return {x: x+1, y: y};
+      if(o==types.Orientation.BOTTOMRIGHT)
+        return {x: x+1, y: y+1};
+      if(o==types.Orientation.BOTTOM)
+        return {x: x, y: y+1};
+      if(o==types.Orientation.BOTTOMLEFT)
+        return {x: x-1, y: y+1};
+      if(o==types.Orientation.LEFT)
+        return {x: x-1, y: y};
     }
   };
   
