@@ -124,7 +124,7 @@
         ctx.rotate(types.Orientation.degre(o));
         drawImage(properties.icon, -toolObjectSize.w/2, -toolObjectSize.h/2);
         ctx.restore();
-        node.attr('toolType', type);
+        node.attr('tooltype', type);
         return this;
       },
       number: function(n) {
@@ -233,10 +233,10 @@
         ctx.restore();
       },
       turnLeft: function() {
-        this.tool(tooltype(), types.Orientation.next(orientation()));
+        this.tool(tooltype(), types.Orientation.prev(orientation()));
       },
       turnRight: function() {
-        this.tool(tooltype(), types.Orientation.prev(orientation()));
+        this.tool(tooltype(), types.Orientation.next(orientation()));
       },
       empty: function() {
         role('empty');
@@ -280,7 +280,7 @@
         ctx.save();
         ctx.translate(caseSize.w/2, caseSize.h/2);
         ctx.rotate(types.Orientation.degre(o));
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 5;
         ctx.strokeStyle = types.Color.rgba(c,1,100);
         ctx.strokeRect(-caseSize.w/2+4, -caseSize.h/4, caseSize.w-8, caseSize.h/2);
         style(types.Color.rgba(c,1,150));
@@ -321,7 +321,11 @@
     
     getGrid = function(level, callback) {
       $.get(level2file(level), function(data) {
-        callback(parseLevel(data));
+        var level = parseLevel(data);
+        if($.isEmptyObject(level)) {
+          console.log('Unable to parse level.');
+        }
+        callback(level);
       });
     };
     
@@ -337,6 +341,17 @@
     
     var lasersCanvas, lasersCtx;
     
+    var computedLasers;
+    
+    var joinArray = function(a, b) {
+      var newArray = [];
+      for(var i in a)
+        newArray.push(a[i]);
+      for(var i in b)
+        newArray.push(b[i]);
+      return newArray;
+    };
+
     /// utils
     var inRange = function(i, a, b) {
       return i>=a && i<b;
@@ -358,7 +373,7 @@
     }
     var drawLasers = function(lasers) {
       lasersCtx.lineJoin = 'round';
-      lasersCtx.shadowBlur = caseSize.w/2;
+      lasersCtx.shadowBlur = caseSize.w/4;
       lasersCtx.globalCompositeOperation = 'lighter';
       lasersCtx.lineWidth = caseSize.w/8;
       for(var i in lasers) {
@@ -367,8 +382,22 @@
         for(var p in laser.points) {
           var point = laser.points[p];
           var role = point.obj.role();
-          var offsetX = role=='empty' && (point.x==0 || point.x==gridSize.w-1) ? 1 : 0.5;
-          var offsetY = role=='empty' && (point.y==0 || point.y==gridSize.h-1) ? 1 : 0.5;
+          
+          var offsetX = 0.5, offsetY = 0.5;
+          if(role=="empty") {
+            if(point.x==0)
+              offsetX = 0;
+            else if(point.x==gridSize.w-1)
+              offsetX = 1;
+            if(point.y==0)
+              offsetY = 0;
+            else if(point.y==gridSize.h-1)
+              offsetY = 1;
+          }
+          
+         // var offsetX = role=='empty' && (point.x==0 || point.x==gridSize.w-1) ? 1 : 0.5;
+         // var offsetY = role=='empty' && (point.y==0 || point.y==gridSize.h-1) ? 1 : 0.5;
+          
           points.push({ x: (offsetX+point.x)*caseSize.w, y: (offsetY+point.y)*caseSize.h });
         }
         lasersCtx.strokeStyle = types.Color.rgba(laser.color, 1, 250);
@@ -396,17 +425,15 @@
       return { x: c.x(), y: c.y(), obj: c };
     }
     
-    var traceLaser = function(laserNode) {
-      var lasers = [];
-      
-      var laserCase = new Case(laserNode);
+    var rec_traceRay = function(caseObj, orientation, color, lasers) {
       var laser = {
-        color: laserCase.color(),
-        points: [getCasePos(laserCase)]
+        orientation: orientation,
+        color: color,
+        points: [getCasePos(caseObj)]
       };
-      var orientation = laserCase.orientation();
       var pos;
-      var nextCase = laserCase;
+      var nextCase = caseObj;
+      var currentCase = caseObj;
       var role = "empty";
       while(nextCase) {
         var nextCaseNode = getNextCase(nextCase.node(), orientation);
@@ -414,18 +441,41 @@
         if(!nextCase) break;
         if(role=="empty") {
           pos = getCasePos(nextCase);
-          role = nextCase.role();
+        }
+        else if(role=="tool") {
+          var tool = currentCase.tooltype();
+          var caseOrientation = parseInt(currentCase.orientation());
+          var o = (-caseOrientation+parseInt(orientation)+7)%8; // todo use a function
+          var output = types.ToolProperties[tool].ray(o, color);
+          // TODO
+          nextCase = null;
         }
         else {
           nextCase = null;
+        }
+        if(nextCase) {
+          role = nextCase.role();
+          currentCase = nextCase;
         }
       }
       if(pos) {
         laser.points.push(pos);
         lasers.push(laser);
       }
-      
-      drawLasers(lasers);
+      return lasers;
+    };
+    
+    var computeRays = function() {
+      var lasers = [];
+      $('.case[role=laser]').each(function(){
+        var laserNode = $(this);
+        var laserCase = new Case(laserNode);
+        var orientation = laserCase.orientation();
+        var color = laserCase.color();
+        var lasersForThisRay = rec_traceRay(laserCase, orientation, color, []);
+        lasers = joinArray(lasers, lasersForThisRay);
+      });
+      return computedLasers = lasers;
     };
     
     return {
@@ -434,12 +484,11 @@
         lasersCtx = lasersCanvas.getContext('2d');
       },
       trace: function() {
-        console.log('retrace lasers');
         resetLasers();
-        $('.case[role=laser]').each(function(){
-          traceLaser($(this));
-        });
-      }
+        computeRays();
+        drawLasers(computedLasers);
+      },
+      compute: computeRays
     };
   }();
   $(document).ready(RayTracer.init);
