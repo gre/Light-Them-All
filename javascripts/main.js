@@ -172,6 +172,16 @@
     
     var empty = function(){
       node[0].width = node[0].width;
+      ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(caseSize.w, caseSize.h);
+      ctx.lineTo(0, caseSize.h);
+      ctx.lineTo(0, 0);
+      ctx.lineTo(caseSize.w, 0);
+      ctx.lineTo(caseSize.w, caseSize.h);
+      ctx.closePath();
+      ctx.stroke(); // TODO : make this with background
     };
     
     var role = function(role) {
@@ -249,11 +259,7 @@
       },
       bomb: function(){
         role('bomb');
-        style('rgba(150,0,0,0.5)');
-        rectAll();
-        style('rgb(150,0,0)');
-        ctx.beginPath();
-        ctx.arc(caseSize.w/2, caseSize.h/2, caseSize.h/3, 0, Math.PI*2, true);
+        drawImage($('#image_bomb')[0]);
         ctx.fill();
       },
       receptor: function(c){
@@ -263,9 +269,9 @@
         color(c);
         style(types.Color.rgba(c));
         ctx.beginPath();
-        ctx.arc(caseSize.w/2, caseSize.h/2, caseSize.h/3, 0, Math.PI*2, true);
+        ctx.arc(caseSize.w/2, caseSize.h/2, caseSize.h/2-4, 0, Math.PI*2, true);
         ctx.fill();
-        style(types.Color.rgba(c,1,400));
+        style(types.Color.rgba(c,1,200));
         ctx.beginPath();
         ctx.arc(caseSize.w/2, caseSize.h/2, caseSize.h/4, 0, Math.PI*2, true);
         ctx.fill();
@@ -280,8 +286,8 @@
         ctx.save();
         ctx.translate(caseSize.w/2, caseSize.h/2);
         ctx.rotate(types.Orientation.degre(o));
-        ctx.shadowBlur = 5;
-        ctx.strokeStyle = types.Color.rgba(c,1,100);
+        ctx.shadowBlur = 2;
+        ctx.strokeStyle = types.Color.rgba(c,0.2,100);
         ctx.strokeRect(-caseSize.w/2+4, -caseSize.h/4, caseSize.w-8, caseSize.h/2);
         style(types.Color.rgba(c,1,150));
         ctx.fillRect(-caseSize.w/2+4, -caseSize.h/4, caseSize.w-8, caseSize.h/2);
@@ -414,7 +420,6 @@
             lasersCtx.lineTo(point.x, point.y);
           }
         }
-        lasersCtx.closePath();
         lasersCtx.stroke();
       }
     };

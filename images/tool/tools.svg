@@ -19,6 +19,17 @@
   <defs
      id="defs4">
     <linearGradient
+       id="linearGradient3319">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0.52941179;"
+         offset="0"
+         id="stop3321" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop3323" />
+    </linearGradient>
+    <linearGradient
        id="linearGradient4515">
       <stop
          style="stop-color:#4d4d4d;stop-opacity:1;"
@@ -178,11 +189,11 @@
     <linearGradient
        id="linearGradient3737-2-1">
       <stop
-         style="stop-color:#666666;stop-opacity:1;"
+         style="stop-color:#ff643d;stop-opacity:1;"
          offset="0"
          id="stop3739-8-9" />
       <stop
-         style="stop-color:#000000;stop-opacity:1;"
+         style="stop-color:#8b0000;stop-opacity:1;"
          offset="1"
          id="stop3741-4-8" />
     </linearGradient>
@@ -625,19 +636,6 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
-    <filter
-       color-interpolation-filters="sRGB"
-       inkscape:collect="always"
-       id="filter4593-7"
-       x="-0.068859383"
-       width="1.1377188"
-       y="-0.4663488"
-       height="1.9326977">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="1.0796055"
-         id="feGaussianBlur4595-2" />
-    </filter>
     <inkscape:perspective
        id="perspective4633"
        inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
@@ -654,48 +652,23 @@
        sodipodi:type="inkscape:persp3d" />
     <filter
        inkscape:collect="always"
-       id="filter4703"
-       x="-0.15864639"
-       width="1.3172928"
-       y="-1.0744295"
-       height="3.148859">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="2.4873227"
-         id="feGaussianBlur4705" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       id="filter4717"
-       x="-0.20468509"
-       width="1.4093702"
-       y="-0.23206404"
-       height="1.4641281">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="2.487323"
-         id="feGaussianBlur4719" />
-    </filter>
-    <filter
-       inkscape:collect="always"
-       id="filter4721"
-       x="-0.20468509"
-       width="1.4093702"
-       y="-0.23206404"
-       height="1.4641281">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="2.487323"
-         id="feGaussianBlur4723" />
-    </filter>
-    <filter
-       inkscape:collect="always"
        id="filter4729">
       <feGaussianBlur
          inkscape:collect="always"
          stdDeviation="1.2758692"
          id="feGaussianBlur4731" />
     </filter>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3737-2-1"
+       id="radialGradient3331"
+       cx="351.43668"
+       cy="767.1297"
+       fx="351.43668"
+       fy="767.1297"
+       r="46.03125"
+       gradientTransform="matrix(0.67336545,0.96275636,-1.2266774,0.74877632,1055.812,-144.49205)"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -704,17 +677,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
-     inkscape:cx="299.73093"
-     inkscape:cy="668.6193"
+     inkscape:zoom="3.84"
+     inkscape:cx="354.6954"
+     inkscape:cy="268.75294"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1280"
-     inkscape:window-height="976"
-     inkscape:window-x="-4"
-     inkscape:window-y="25"
-     inkscape:window-maximized="1" />
+     inkscape:window-width="1384"
+     inkscape:window-height="856"
+     inkscape:window-x="56"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -723,7 +696,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -833,6 +806,14 @@
        x="100.25"
        y="724.11218"
        ry="0" />
+    <path
+       style="fill:#290000;fill-opacity:1;stroke:#000000;stroke-width:0.60159980999999996px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 374.56578,747.69433 0,-5.72845 c -5.03022,-1.70587 -11.2027,-1.59718 -16.75001,0 l 0,6.12811 16.75001,-0.39966 z"
+       id="path3335"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/bomb.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <rect
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect2837-2-6-4"
@@ -840,7 +821,10 @@
        height="128"
        x="300.25"
        y="724.11218"
-       ry="0" />
+       ry="0"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/bomb.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <rect
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect2837-2-1-1-0"
@@ -849,6 +833,54 @@
        x="500.25"
        y="724.11218"
        ry="0" />
+    <path
+       sodipodi:type="arc"
+       style="fill:url(#radialGradient3331);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.4535535;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path3309"
+       sodipodi:cx="361.85361"
+       sodipodi:cy="784.56653"
+       sodipodi:rx="45.53125"
+       sodipodi:ry="42.535774"
+       d="m 407.38486,784.56653 a 45.53125,42.535774 0 1 1 -91.0625,0 45.53125,42.535774 0 1 1 91.0625,0 z"
+       transform="matrix(0.99743045,0,0,1.067672,4.5497103,-37.382981)"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/bomb.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#5c0000;stroke:#000000;stroke-width:0.64374637999999995px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+       d="m 357.8209,742.23428 0,16.31823 c 5.60148,2.33004 11.12847,2.64739 16.76735,0 l 0,-16.46793 c -4.72872,1.48388 -9.68095,2.59527 -16.76735,0.1497 z"
+       id="path3333"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/bomb.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 366.14583,741.94552 c 0,0 9.11459,-16.14584 16.14584,-8.85417 4.87688,5.05751 5.5426,13.33725 11.56365,14.0324 5.81289,0.67111 9.11178,-4.67844 13.95718,-10.64698"
+       id="path4113"
+       sodipodi:nodetypes="csac"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/bomb.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       sodipodi:type="star"
+       style="fill:#ffc82a;fill-opacity:1;stroke:#ed9d4b;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="path4115"
+       sodipodi:sides="8"
+       sodipodi:cx="323.69791"
+       sodipodi:cy="740.64343"
+       sodipodi:r1="14.275489"
+       sodipodi:r2="3.8793447"
+       sodipodi:arg1="1.3125441"
+       sodipodi:arg2="1.7052432"
+       inkscape:flatsided="false"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m 327.34374,754.44552 -4.16583,-9.95775 -6.66156,8.4932 4.09551,-9.98687 -10.71604,1.29517 9.95775,-4.16583 -8.4932,-6.66156 9.98687,4.0955 -1.29517,-10.71603 4.16583,9.95775 6.66156,-8.49321 -4.0955,9.98688 10.71603,-1.29517 -9.95775,4.16583 8.49321,6.66156 -9.98688,-4.09551 1.29517,10.71604 z"
+       transform="matrix(0.62672977,0,0,0.62672977,205.332,272.16327)"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/bomb.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
   </g>
   <g
      inkscape:groupmode="layer"
