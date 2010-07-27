@@ -459,9 +459,9 @@
       while(nextCase) {
         var nextCaseNode = getNextCase(nextCase.node(), laser.orientation);
         nextCase = nextCaseNode ? new Case(nextCaseNode) : null;
-        if(!nextCase) break;
+        pos = getCasePos(currentCase);
+        
         if(role=="empty") {
-          pos = getCasePos(nextCase);
         }
         else if(role=="tool") {
           var tool = currentCase.tooltype();
@@ -470,14 +470,9 @@
           
           var output = types.ToolProperties[tool].ray(relativeCaseOrientation, color);
           
-          console.log('types.ToolProperties['+tool+'].ray('+relativeCaseOrientation+', '+color+') => ', output);
-          
-          
-          // TODO
           var currentCasePos = getCasePos(currentCase);
           for(var o in output) {
             var orientation = (5 +caseOrientation + parseInt(o))%8;
-            console.log(o, orientation);
             var color = output[o];
             if(!rayExists(currentCasePos, color, orientation, lasers)) {
               console.log('not exists');
@@ -485,10 +480,8 @@
             }
             else {
               console.log('exists');
-              
             }
           }
-          
           nextCase = null;
         }
         else {

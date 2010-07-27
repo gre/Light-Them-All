@@ -707,7 +707,7 @@
        xlink:href="#linearGradient3737"
        id="linearGradient3922"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(22.765625,1.1981908)"
+       gradientTransform="translate(16.774671,1.1981908)"
        x1="169.17162"
        y1="178.3165"
        x2="233.85034"
@@ -721,8 +721,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.83459163"
-     inkscape:cx="364.25"
-     inkscape:cy="564.25"
+     inkscape:cx="268.39474"
+     inkscape:cy="660.10526"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="false"
@@ -747,7 +747,7 @@
      inkscape:label="background"
      inkscape:groupmode="layer"
      id="layer1"
-     style="display:inline">
+     style="display:none">
     <rect
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect2837"
@@ -875,7 +875,7 @@
      inkscape:label="Layer">
     <path
        style="fill:url(#linearGradient3922);fill-opacity:1;stroke:#000000;stroke-width:1.10786402px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 173.82108,140.17014 c 54.38978,14.5737 54.36261,84.1927 -0.49645,98.89214 -5.28214,-19.7132 -5.52612,-76.41559 0.49645,-98.89214 z"
+       d="m 167.83013,140.17014 c 54.38978,14.5737 54.36261,84.1927 -0.49645,98.89214 -5.28214,-19.7132 -5.52612,-76.41559 0.49645,-98.89214 z"
        id="path3721"
        sodipodi:nodetypes="ccc"
        inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/simple.png"
@@ -883,7 +883,7 @@
        inkscape:export-ydpi="90" />
     <path
        style="opacity:0.5;fill:#ffffff;stroke:none"
-       d="m 176.62468,145.49576 c 6.61427,33.23333 8.48892,64.09684 0,89.77856 -5.09297,-26.52056 -4.91785,-56.84256 0,-89.77856 z"
+       d="m 170.63373,145.49576 c 6.61427,33.23333 8.48892,64.09684 0,89.77856 -5.09297,-26.52056 -4.91785,-56.84256 0,-89.77856 z"
        id="path3727"
        sodipodi:nodetypes="ccc"
        inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/simple.png"
