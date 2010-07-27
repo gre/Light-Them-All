@@ -1,4 +1,7 @@
 {
+  name: "Level 1 - Hello world",
+  description: "Here you are",
+  
   grid: [
     laser(R, BOTTOMRIGHT), empty, empty, empty,        empty,  laser(B, BOTTOM), empty,       empty, empty, empty,
     empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,

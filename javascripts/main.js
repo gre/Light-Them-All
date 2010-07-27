@@ -10,6 +10,10 @@
   
   var g_width;
   
+  var g_currentLevel;
+  
+  var g_playable = false;
+  
   var toolObjectSize = {};
   var caseSize = {};
   var gridSize = { w: 10, h: 10 };
@@ -252,7 +256,9 @@
       wall: function(){
         role('wall');
         style('rgb(100,100,100)');
-        rectAll();
+        ctx.fillRect(4, 4, caseSize.w-8, caseSize.h-8);
+        style('rgb(150,150,150)');
+        ctx.fillRect(caseSize.w/6, caseSize.h/6, 2*caseSize.w/3, 2*caseSize.h/3);
       },
       bomb: function(){
         role('bomb');
@@ -329,7 +335,8 @@
         if($.isEmptyObject(level)) {
           console.log('Unable to parse level.');
         }
-        callback(level);
+        else
+          callback(level);
       });
     };
     
@@ -346,6 +353,8 @@
     var lasersCanvas, lasersCtx;
     
     var computedLasers;
+    
+    var bomb_touched;
     
     var joinArray = function(a, b) {
       var newArray = [];
@@ -461,9 +470,7 @@
         nextCase = nextCaseNode ? new Case(nextCaseNode) : null;
         pos = getCasePos(currentCase);
         
-        if(role=="empty") {
-        }
-        else if(role=="tool") {
+        if(role=="tool") {
           var tool = currentCase.tooltype();
           var caseOrientation = parseInt(currentCase.orientation());
           var relativeCaseOrientation = (-caseOrientation+laser.orientation+7)%8; // todo use a function
@@ -475,18 +482,22 @@
             var orientation = (5 +caseOrientation + parseInt(o))%8;
             var color = output[o];
             if(!rayExists(currentCasePos, color, orientation, lasers)) {
-              console.log('not exists');
+              //console.log('not exists');
               rec_traceRay(currentCase, orientation, color, lasers);
             }
             else {
-              console.log('exists');
+              //console.log('exists');
             }
           }
+        }
+        else if(role=="bomb") {
+          bomb_touched = true;
+        }
+        
+        if(role!="empty") {
           nextCase = null;
         }
-        else {
-          nextCase = null;
-        }
+        
         if(nextCase) {
           role = nextCase.role();
           currentCase = nextCase;
@@ -501,6 +512,7 @@
     
     var computeRays = function() {
       var lasers = [];
+      bomb_touched = false;
       $('.case[role=laser]').each(function(){
         var laserNode = $(this);
         var laserCase = new Case(laserNode);
@@ -521,6 +533,8 @@
         resetLasers();
         computeRays();
         drawLasers(computedLasers);
+        if(bomb_touched)
+          Popup.bomb();
       },
       compute: computeRays
     };
@@ -599,10 +613,14 @@
     return {
       getCaseNode: getCaseNode,
       getCase: getCase,
-      start: function(level) {       
+      start: function(level) {
+        g_playable = false;
         var game = $('#game');
         
+        
+        Popup.open("<h1>Chargement...</h1>");
         Level.getGrid(level, function(lvl){
+          $('#play .toolbar h1').text(lvl.name||'Game');
           grid = lvl.grid;
           tools = lvl.tools;
           var i = 0;
@@ -652,6 +670,11 @@
           }
           
           $(window).resize();
+          
+          Popup.level(lvl, function(){
+            g_currentLevel = level;
+            g_playable = true;
+          });
         });
       },
       
@@ -677,6 +700,55 @@
     }
   }();
   
+  var Popup = lta.Popup = function(){
+    
+    var g_popup = null;
+    
+    var oldPlayable = null;
+    
+    var openPopup = function(content) {
+      oldPlayable = g_playable;
+      g_playable = false;
+      if(!content) content = "";
+      g_popup.empty().append($('<div class="content" />').width(g_width-60).append(content)).show();
+    };
+    
+    var close = function(){
+      g_popup.hide().empty();
+    };
+    
+    return {
+      init: function(){
+        if($("#popup").size()==0) $("#game").append('<div id="popup" />');
+        g_popup = $("#popup");
+        close();
+      },
+      open: function(content) {
+        openPopup(content);
+      },
+      bomb: function() {
+        openPopup('<h1>Failure</h1>'+
+        '<p>You exploded a bomb.</p>'+
+        '<p class="buttons"><a href="javascript: lta.Game.start('+g_currentLevel+');">Try again</a></p>');
+      },
+      level: function(lvl, callback) {
+        var h1 = $('<h1/>').text(lvl.name||'');
+        var description = $('<span class="description" />').text(lvl.description||'');
+        var startLevelLink = $('<a href="javascript:;">Start level</a>');
+        openPopup($().after(h1).after(description).after($('<p class="buttons" />').append(startLevelLink)));
+        if(callback) {
+          startLevelLink.click(function(){
+            close();
+            callback();
+          });
+        }
+      },
+      close: function() {
+        close();
+      }
+    }
+  }();
+  $(document).ready(Popup.init);
   
   var Game = lta.Game = function() {
     
@@ -692,10 +764,10 @@
       return GameGrid.getCaseNode(x, y);
     };
     
-    
     var bindEvents = function() {
       
-      Event.touchstart(function(e) {
+      Event.touchstart(function(e) { 
+        if(!g_playable) return;
         var node = $(e.target);
           
         if(node.parent().is('.toolObjectContainer')) node = node.parent();
@@ -721,7 +793,8 @@
         }
       });
       
-      Event.touchend(function(e){
+      Event.touchend(function(e){  
+        if(!g_playable) return;
         var target = $(e.target);
         var dragging = $('#game .dragging');
         var dragHelper = $('#dragHelper');
@@ -739,6 +812,7 @@
       
       Event.touchmove(function(e) {
         e.preventDefault();
+        if(!g_playable) return;
         
         var dragHelper = $('#dragHelper');
         var x, y;
@@ -809,20 +883,13 @@
         $('#game .gamePanel').width(width);
         
         GameGrid.init();
-        
-        $(window).resize(function(){
-          gameGrid.css('margin', '0px auto');
-          var marginTopBottom = Math.floor(($(window).height() - $('#play').height())/2);
-          if(marginTopBottom<0) marginTopBottom = 0;
-          gameGrid.css('margin', marginTopBottom+'px auto');
-        }).resize();
         bindEvents();
       },
       
       start: function(level) {
         if(!level) level=1;
         GameGrid.start(level);
-        $(window).resize();
+        Popup.close();
       }
     }
   }();

@@ -8,7 +8,7 @@ body>*
     background: -moz-linear-gradient(-90deg, #333, #5e5e65);
     background: -webkit-gradient(linear,0% 0,0% 100%,from(#333),to(#5e5e65));
 }
-h1,h2
+.toolbar h1, .toolbar h2
 {
     color: #000;
     font: bold 18px Helvetica;
