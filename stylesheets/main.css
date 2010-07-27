@@ -92,7 +92,9 @@
 #dragHelper.overGrid.overEmptyCase {
   background: rgba(100,255,100,0.5);
 }
-
+#dragHelper.overGrid.overDraggingCase {
+  background: transparent;
+}
 #dragHelper.overGrid {
   background: rgba(255,100,100,0.5);
 }

@@ -187,7 +187,8 @@
     var orientation = function(o) {
       if(typeof(o)!="undefined")
         node.attr("orientation", o);
-      return node.attr("orientation") || types.Orientation.RIGHT;
+      o = node.attr("orientation");
+      return o ? parseInt(o) : types.Orientation.RIGHT;
     }
     var tooltype = function(t) {
       if(typeof(t)!="undefined")
@@ -197,7 +198,8 @@
     var color = function(c) {
       if(typeof(c)!="undefined")
         node.attr("color", c);
-      return node.attr("color") || types.Color.R;
+      c = node.attr("color");
+      return c ? parseInt(c) : types.Color.R;
     }
     
     return {
@@ -305,6 +307,7 @@
       var appendScript = 'for(var v in types.Orientation) this[v]=types.Orientation[v];'+
       'for(var v in types.Color) this[v]=types.Color[v];'+
       'for(var v in types.ToolType) this[v]=types.ToolType[v];'+
+      'var empty=0;'+
       'var bomb=function(){ return { mapObject: types.MapObject.BOMB } };'+
       'var receptor=function(c){ return { mapObject: types.MapObject.RECEPTOR, color: c } };'+
       'var laser=function(c,o){ return { mapObject: types.MapObject.LASER, color: c, orientation: o } };'+
@@ -368,6 +371,14 @@
       else return GameGrid.getCaseNode(nextPos.x, nextPos.y);
     };
     
+    var getCasePos = function(c) {
+      return { x: c.x(), y: c.y(), obj: c };
+    }
+    
+    var casePosEquals = function(a, b) {
+      return a.x==b.x && a.y==b.y;
+    };
+    
     /// Graphical part
     var resetLasers = function() {
       lasersCanvas.width = lasersCanvas.width;
@@ -384,8 +395,10 @@
           var point = laser.points[p];
           var role = point.obj.role();
           
+          
+          
           var offsetX = 0.5, offsetY = 0.5;
-          if(role=="empty") {
+          /*if(role=="empty") {
             if(point.x==0)
               offsetX = 0;
             else if(point.x==gridSize.w-1)
@@ -394,7 +407,7 @@
               offsetY = 0;
             else if(point.y==gridSize.h-1)
               offsetY = 1;
-          }
+          }*/ // TODO : use Orientation.move() to know the correct offset
           
          // var offsetX = role=='empty' && (point.x==0 || point.x==gridSize.w-1) ? 1 : 0.5;
          // var offsetY = role=='empty' && (point.y==0 || point.y==gridSize.h-1) ? 1 : 0.5;
@@ -421,13 +434,31 @@
     
     /// Algorithmic part
     
-    var getCasePos = function(c) {
-      return { x: c.x(), y: c.y(), obj: c };
+    
+    /*
+     * @arg rays : [ { orientation, color, points }, ... ]
+     */
+    var rayExists = function(position, color, orientation, rays) {
+      var reverseOrientation = (4+orientation)%8;
+      for(var r in rays) {
+        var ray = rays[r];
+        if(ray.color==color) {
+          if(orientation==ray.orientation) {
+            if(casePosEquals(ray.points[0], position))
+              return true;
+          }
+          else if(reverseOrientation==ray.orientation) {
+            if(casePosEquals(ray.points[1], position))
+              return true;
+          }
+        }
+      }
+      return false;
     }
     
-    var rec_traceRay = function(caseObj, orientation, color, lasers) {
+    var rec_traceRay = function(caseObj, laserOrientation, color, lasers) {
       var laser = {
-        orientation: orientation,
+        orientation: laserOrientation,
         color: color,
         points: [getCasePos(caseObj)]
       };
@@ -436,7 +467,7 @@
       var currentCase = caseObj;
       var role = "empty";
       while(nextCase) {
-        var nextCaseNode = getNextCase(nextCase.node(), orientation);
+        var nextCaseNode = getNextCase(nextCase.node(), laser.orientation);
         nextCase = nextCaseNode ? new Case(nextCaseNode) : null;
         if(!nextCase) break;
         if(role=="empty") {
@@ -445,9 +476,29 @@
         else if(role=="tool") {
           var tool = currentCase.tooltype();
           var caseOrientation = parseInt(currentCase.orientation());
-          var o = (-caseOrientation+parseInt(orientation)+7)%8; // todo use a function
-          var output = types.ToolProperties[tool].ray(o, color);
+          var relativeCaseOrientation = (-caseOrientation+laser.orientation+7)%8; // todo use a function
+          
+          var output = types.ToolProperties[tool].ray(relativeCaseOrientation, color);
+          
+          console.log('types.ToolProperties['+tool+'].ray('+relativeCaseOrientation+', '+color+') => ', output);
+          
+          
           // TODO
+          var currentCasePos = getCasePos(currentCase);
+          for(var o in output) {
+            var orientation = (5 +caseOrientation + parseInt(o))%8;
+            console.log(o, orientation);
+            var color = output[o];
+            if(!rayExists(currentCasePos, color, orientation, lasers)) {
+              console.log('not exists');
+              rec_traceRay(currentCase, orientation, color, lasers);
+            }
+            else {
+              console.log('exists');
+              
+            }
+          }
+          
           nextCase = null;
         }
         else {
@@ -518,6 +569,13 @@
         }
         else
           $('#dragHelper').removeClass('overEmptyCase');
+        
+        if(node.is('.dragging'))
+          $('#dragHelper').addClass('overDraggingCase');
+        else
+          $('#dragHelper').removeClass('overDraggingCase');
+        
+        
       });
       node.bind('draghoverout', function(e, dragging){
         var c = new Case(ctx);

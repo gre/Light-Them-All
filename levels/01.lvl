@@ -1,15 +1,15 @@
 {
   grid: [
-    laser(R, BOTTOMRIGHT), 0, 0, 0, 0, laser(B, BOTTOM), 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, receptor(G), 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    laser(RGB, RIGHT), 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, receptor(RG), bomb(), 0, 0, 0, 0, 0
+    laser(R, BOTTOMRIGHT), empty, empty, empty,        empty,  laser(B, BOTTOM), empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            receptor(G), empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    laser(RGB, RIGHT),     empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, wall(),       empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, receptor(RG), bomb(), empty,            empty,       empty, empty, empty
   ],
   
   tools: [

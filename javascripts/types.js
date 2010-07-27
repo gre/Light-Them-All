@@ -252,11 +252,11 @@
       case types.ToolType.SPLITER: 
         input[types.Orientation.LEFT] = function(color) {
           var output = {};
-          var c = types.Color.mix(color, types.Color.R);
+          var c = types.Color.filter(color, types.Color.R);
           if(c) output[types.Orientation.TOPRIGHT] = c;
-          c = types.Color.mix(color, types.Color.G);
+          c = types.Color.filter(color, types.Color.G);
           if(c) output[types.Orientation.RIGHT] = c;
-          c = types.Color.mix(color, types.Color.B);
+          c = types.Color.filter(color, types.Color.B);
           if(c) output[types.Orientation.BOTTOMRIGHT] = c;
           return output;
         };
