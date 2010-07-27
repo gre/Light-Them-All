@@ -12,14 +12,14 @@
   
   var toolObjectSize = {};
   var caseSize = {};
-  var gridSize = { w: 8, h: 8 };
+  var gridSize = { w: 10, h: 10 };
   
   var Event = lta.Event = function() {
     
     var useTouch = hasTouch && !isChrome;
     var target = document;
     
-    var touchstart, touchmove, touchend, touch;
+    var touchstart, touchmove, touchend;
     
     if(useTouch) {
       touchstart = function(fn) {
@@ -31,7 +31,6 @@
       touchend = function(fn) {
         $(target).bind('touchend', fn);
       };
-      touch = function(){};
     }
     else {
       touchstart = function(fn) {
@@ -43,16 +42,12 @@
       touchend = function(fn) {
         $(document).bind('mouseup', fn);
       };
-      touch = function(fn) {
-        $(document).bind('click', fn);
-      };
     }
         
     return {
       touchstart: touchstart,
       touchmove: touchmove,
-      touchend: touchend,
-      touch: touch
+      touchend: touchend
     }
   }();
   
@@ -659,13 +654,6 @@
     
     var bindEvents = function() {
       
-      Event.touch(function(e){
-        var node = $(e.target);
-        if(node.is('.case')) {
-          node.trigger('touch');
-        }
-      });
-      
       Event.touchstart(function(e) {
         var node = $(e.target);
           
@@ -701,6 +689,9 @@
           dragging.trigger('dragend');
           dragHelper.remove();
           $('#game .case.draghover').removeClass('draghover').trigger('draghoverout').trigger('dropped', dragging);
+        }
+        else if(target.is('.case.touching')) {
+         target.trigger('touch');
         }
         $('#game .case.touching').removeClass('touching');
       });
