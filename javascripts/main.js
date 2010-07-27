@@ -493,6 +493,9 @@
         else if(role=="bomb") {
           bomb_touched = true;
         }
+        else if(role=="receptor") {
+          // TODO
+        }
         
         if(role!="empty") {
           nextCase = null;
@@ -524,18 +527,23 @@
       return computedLasers = lasers;
     };
     
+    var trace = function() {
+      resetLasers();
+      computeRays();
+      drawLasers(computedLasers);
+      if(bomb_touched)
+        Popup.bomb();
+    };
+    
     return {
       init: function() {
         lasersCanvas = $('#game canvas.lasers')[0];
         lasersCtx = lasersCanvas.getContext('2d');
+        $('#game').bind('gridChanged', function(){
+          trace();
+        });
       },
-      trace: function() {
-        resetLasers();
-        computeRays();
-        drawLasers(computedLasers);
-        if(bomb_touched)
-          Popup.bomb();
-      },
+      trace: trace,
       compute: computeRays
     };
   }();
@@ -587,7 +595,7 @@
           if(c.role()!='empty') return;
           c.tool($('canvas', dragging).attr('tooltype'));
           new PanelObject(dragging).decr();
-          new Sound('#audio_drop').play();
+          $('#game').trigger('gridChanged').trigger('gridCaseDrop');
         }
         else if(dragging.is('.case')) {
           var c = new Case(ctx);
@@ -596,16 +604,14 @@
           c.orientation(draggingCase.orientation());
           c.tool(draggingCase.tooltype());
           draggingCase.empty();
-          new Sound('#audio_drop').play();
+          $('#game').trigger('gridChanged').trigger('gridCaseDrop');
         }
-        RayTracer.trace();
       });
       node.bind('touch', function(e) {
         var c = new Case(ctx);
         if(c.role()=='tool') {
           c.turnRight();
-          new Sound('#audio_turn').play();
-          RayTracer.trace();
+          $('#game').trigger('gridChanged').trigger('gridCaseTurn');
         }
       });
     };
@@ -733,7 +739,7 @@
       },
       level: function(lvl, callback) {
         var h1 = $('<h1/>').text(lvl.name||'');
-        var description = $('<span class="description" />').text(lvl.description||'');
+        var description = $('<p class="description" />').text(lvl.description||'');
         var startLevelLink = $('<a href="javascript:;">Start level</a>');
         openPopup($().after(h1).after(description).after($('<p class="buttons" />').append(startLevelLink)));
         if(callback) {
@@ -765,6 +771,13 @@
     };
     
     var bindEvents = function() {
+      
+      $('#game').bind('gridCaseDrop', function(){
+        new Sound('#audio_drop').play();
+      });
+      $('#game').bind('gridCaseTurn', function(){
+        new Sound('#audio_turn').play();
+      });
       
       Event.touchstart(function(e) { 
         if(!g_playable) return;
@@ -843,8 +856,8 @@
         var dragging = $('#game .dragging');
         
         if(dragging.size()>0) {
-          var left = Math.floor(x-toolObjectSize.w/2);
-          var top = Math.floor(y-toolObjectSize.h/2);
+          var left = Math.floor(x-toolObjectSize.w/2-$('#game').position().left);
+          var top = Math.floor(y-toolObjectSize.h/2-$('#game').position().top);
           dragHelper.show().css({
             top: top+'px',
             left: left+'px'
@@ -904,11 +917,21 @@
         
         Game.init();
         
-        $(document).ready(function(e){
-        $('#play').bind('pageAnimationEnd', function(event, info){
+        var continuableGame = localStorage.getItem('continuableGame');
+        if(!continuableGame) {
+          $('.destroyIfNoContinuableGame').remove();
+        }
+        else {
+          $('a.continueGame').click(function(){
+            continuableGame = localStorage.getItem('continuableGame');
+            Game.start(continuableGame.level);
+          });
+        }
+        $('a.newGame').click(function(){
           Game.start();
-        })
-    });
+        });
+        
+        
       }
     }
   }();

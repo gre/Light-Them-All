@@ -3,16 +3,16 @@
   description: "Here you are",
   
   grid: [
-    laser(R, BOTTOMRIGHT), empty, empty, empty,        empty,  laser(B, BOTTOM), empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            receptor(G), empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    laser(RGB, RIGHT),     empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, wall(),       empty,  empty,            empty,       empty, empty, empty,
+    laser(R, BOTTOMRIGHT), empty, laser(B, BOTTOM), empty,        empty,  empty, empty,       empty, empty, laser(G, BOTTOMLEFT),
     empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
     empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, receptor(RG), bomb(), empty,            empty,       empty, empty, empty
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,       empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty
   ],
   
   tools: [
