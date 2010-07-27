@@ -395,22 +395,12 @@
           var point = laser.points[p];
           var role = point.obj.role();
           
-          
-          
           var offsetX = 0.5, offsetY = 0.5;
-          /*if(role=="empty") {
-            if(point.x==0)
-              offsetX = 0;
-            else if(point.x==gridSize.w-1)
-              offsetX = 1;
-            if(point.y==0)
-              offsetY = 0;
-            else if(point.y==gridSize.h-1)
-              offsetY = 1;
-          }*/ // TODO : use Orientation.move() to know the correct offset
-          
-         // var offsetX = role=='empty' && (point.x==0 || point.x==gridSize.w-1) ? 1 : 0.5;
-         // var offsetY = role=='empty' && (point.y==0 || point.y==gridSize.h-1) ? 1 : 0.5;
+          if(p>0 && role=="empty" && (point.x==0 || point.x==gridSize.w-1 || point.y==0 || point.y==gridSize.h-1)) {
+            var offset = types.Orientation.move(laser.orientation, 0, 0);
+            offsetX = (1+offset.x)/2;
+            offsetY = (1+offset.y)/2;
+          }
           
           points.push({ x: (offsetX+point.x)*caseSize.w, y: (offsetY+point.y)*caseSize.h });
         }

@@ -141,7 +141,8 @@
        y1="178.3165"
        x2="233.85034"
        y2="238.41801"
-       gradientUnits="userSpaceOnUse" />
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(16.774671,1.1981908)" />
     <inkscape:perspective
        id="perspective3753"
        inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
@@ -620,7 +621,7 @@
          id="stop3991-5" />
     </linearGradient>
     <linearGradient
-       gradientTransform="matrix(-1.3442207,0,0,1.2078372,934.35962,360.22929)"
+       gradientTransform="matrix(-1.3442207,0,0,1.2078372,951.27245,359.59524)"
        y2="189.80869"
        x2="552.16907"
        y1="192.66069"
@@ -658,17 +659,59 @@
          stdDeviation="1.2758692"
          id="feGaussianBlur4731" />
     </filter>
-    <radialGradient
+    <inkscape:perspective
+       id="perspective3787"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <filter
        inkscape:collect="always"
-       xlink:href="#linearGradient3737-2-1"
-       id="radialGradient3331"
-       cx="351.43668"
-       cy="767.1297"
-       fx="351.43668"
-       fy="767.1297"
-       r="46.03125"
-       gradientTransform="matrix(0.67336545,0.96275636,-1.2266774,0.74877632,1055.812,-144.49205)"
-       gradientUnits="userSpaceOnUse" />
+       id="filter3889"
+       x="-0.28132315"
+       width="1.5626463"
+       y="-0.1983073"
+       height="1.3966146">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.7737296"
+         id="feGaussianBlur3891" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3893"
+       x="-0.28132315"
+       width="1.5626463"
+       y="-0.1983073"
+       height="1.3966146">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.7737296"
+         id="feGaussianBlur3895" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3897"
+       x="-0.71935138"
+       width="2.4387028"
+       y="-0.14595535"
+       height="1.2919107">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.7737296"
+         id="feGaussianBlur3899" />
+    </filter>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3737"
+       id="linearGradient3922"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(22.765625,1.1981908)"
+       x1="169.17162"
+       y1="178.3165"
+       x2="233.85034"
+       y2="238.41801" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -677,11 +720,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.84"
-     inkscape:cx="354.6954"
-     inkscape:cy="268.75294"
+     inkscape:zoom="0.83459163"
+     inkscape:cx="364.25"
+     inkscape:cy="564.25"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer2"
      showgrid="false"
      inkscape:window-width="1384"
      inkscape:window-height="856"
@@ -696,7 +739,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -713,7 +756,7 @@
        x="100.25"
        y="124.11218"
        ry="0"
-       inkscape:export-filename="/home/gre/dev/Light-Them-All/images/tool/simple.png"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/simple.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
@@ -779,9 +822,9 @@
        x="100.25"
        y="524.11218"
        ry="0"
-       inkscape:export-filename="/home/gre/dev/Light-Them-All/images/tool/spliter.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/spliter.png"
+       inkscape:export-xdpi="89.649803"
+       inkscape:export-ydpi="89.649803" />
     <rect
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect2837-2-3"
@@ -806,14 +849,6 @@
        x="100.25"
        y="724.11218"
        ry="0" />
-    <path
-       style="fill:#290000;fill-opacity:1;stroke:#000000;stroke-width:0.60159980999999996px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 374.56578,747.69433 0,-5.72845 c -5.03022,-1.70587 -11.2027,-1.59718 -16.75001,0 l 0,6.12811 16.75001,-0.39966 z"
-       id="path3335"
-       sodipodi:nodetypes="ccccc"
-       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/bomb.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
     <rect
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect2837-2-6-4"
@@ -833,73 +868,25 @@
        x="500.25"
        y="724.11218"
        ry="0" />
-    <path
-       sodipodi:type="arc"
-       style="fill:url(#radialGradient3331);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.4535535;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       id="path3309"
-       sodipodi:cx="361.85361"
-       sodipodi:cy="784.56653"
-       sodipodi:rx="45.53125"
-       sodipodi:ry="42.535774"
-       d="m 407.38486,784.56653 a 45.53125,42.535774 0 1 1 -91.0625,0 45.53125,42.535774 0 1 1 91.0625,0 z"
-       transform="matrix(0.99743045,0,0,1.067672,4.5497103,-37.382981)"
-       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/bomb.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
-    <path
-       style="fill:#5c0000;stroke:#000000;stroke-width:0.64374637999999995px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
-       d="m 357.8209,742.23428 0,16.31823 c 5.60148,2.33004 11.12847,2.64739 16.76735,0 l 0,-16.46793 c -4.72872,1.48388 -9.68095,2.59527 -16.76735,0.1497 z"
-       id="path3333"
-       sodipodi:nodetypes="ccccc"
-       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/bomb.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       d="m 366.14583,741.94552 c 0,0 9.11459,-16.14584 16.14584,-8.85417 4.87688,5.05751 5.5426,13.33725 11.56365,14.0324 5.81289,0.67111 9.11178,-4.67844 13.95718,-10.64698"
-       id="path4113"
-       sodipodi:nodetypes="csac"
-       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/bomb.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
-    <path
-       sodipodi:type="star"
-       style="fill:#ffc82a;fill-opacity:1;stroke:#ed9d4b;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="path4115"
-       sodipodi:sides="8"
-       sodipodi:cx="323.69791"
-       sodipodi:cy="740.64343"
-       sodipodi:r1="14.275489"
-       sodipodi:r2="3.8793447"
-       sodipodi:arg1="1.3125441"
-       sodipodi:arg2="1.7052432"
-       inkscape:flatsided="false"
-       inkscape:rounded="0"
-       inkscape:randomized="0"
-       d="m 327.34374,754.44552 -4.16583,-9.95775 -6.66156,8.4932 4.09551,-9.98687 -10.71604,1.29517 9.95775,-4.16583 -8.4932,-6.66156 9.98687,4.0955 -1.29517,-10.71603 4.16583,9.95775 6.66156,-8.49321 -4.0955,9.98688 10.71603,-1.29517 -9.95775,4.16583 8.49321,6.66156 -9.98688,-4.09551 1.29517,10.71604 z"
-       transform="matrix(0.62672977,0,0,0.62672977,205.332,272.16327)"
-       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/bomb.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Layer">
     <path
-       style="fill:url(#linearGradient3743);stroke:#000000;stroke-width:1.10786402000000006px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
-       d="m 151.05546,138.97195 c 54.38978,14.5737 54.36261,84.1927 -0.49645,98.89214 -5.28214,-19.7132 -5.52612,-76.41559 0.49645,-98.89214 z"
+       style="fill:url(#linearGradient3922);fill-opacity:1;stroke:#000000;stroke-width:1.10786402px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 173.82108,140.17014 c 54.38978,14.5737 54.36261,84.1927 -0.49645,98.89214 -5.28214,-19.7132 -5.52612,-76.41559 0.49645,-98.89214 z"
        id="path3721"
        sodipodi:nodetypes="ccc"
-       inkscape:export-filename="/home/gre/dev/Light-Them-All/images/tool/simple.png"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/simple.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
        style="opacity:0.5;fill:#ffffff;stroke:none"
-       d="m 153.85906,144.29757 c 6.61427,33.23333 8.48892,64.09684 0,89.77856 -5.09297,-26.52056 -4.91785,-56.84256 0,-89.77856 z"
+       d="m 176.62468,145.49576 c 6.61427,33.23333 8.48892,64.09684 0,89.77856 -5.09297,-26.52056 -4.91785,-56.84256 0,-89.77856 z"
        id="path3727"
        sodipodi:nodetypes="ccc"
-       inkscape:export-filename="/home/gre/dev/Light-Them-All/images/tool/simple.png"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/simple.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -1069,19 +1056,58 @@
        inkscape:export-ydpi="90" />
     <path
        style="fill:url(#linearGradient4550);fill-opacity:1;stroke:#000000;stroke-width:1.27420557px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 141.26939,535.19924 c 69.00884,18.49086 66.74302,91.74128 -0.59255,109.78379 0,-8.31443 0.59255,-102.88272 0.59255,-109.78379 z"
+       d="m 158.18222,534.56519 c 69.00884,18.49086 66.74302,91.74128 -0.59255,109.78379 0,-8.31443 0.59255,-102.88272 0.59255,-109.78379 z"
        id="path3945-0"
        sodipodi:nodetypes="ccc"
-       inkscape:export-filename="/home/gre/dev/Light-Them-All/images/tool/spliter.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/spliter.png"
+       inkscape:export-xdpi="89.649803"
+       inkscape:export-ydpi="89.649803" />
     <path
        style="opacity:0.3;fill:#ffffff;fill-opacity:1;stroke:none;filter:url(#filter4729)"
-       d="m 154.11367,543.40087 c 43.86239,25.32396 46.5589,66.79061 0,93.6714 38.1804,-34.56458 23.06621,-64.4659 0,-93.6714 z"
+       d="m 171.0265,542.76682 c 43.86239,25.32396 46.5589,66.79061 0,93.6714 38.1804,-34.56458 23.06621,-64.4659 0,-93.6714 z"
        id="path4707"
        sodipodi:nodetypes="ccc"
-       inkscape:export-filename="/home/gre/dev/Light-Them-All/images/tool/spliter.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/spliter.png"
+       inkscape:export-xdpi="89.649803"
+       inkscape:export-ydpi="89.649803" />
+    <image
+       sodipodi:absref="/Applications/Inkscape.app/inkscape_pasted_image_20100727_164317.png"
+       y="727.54083"
+       x="316.21121"
+       id="image3789"
+       height="120"
+       width="98"
+       xlink:href="/Applications/Inkscape.app/inkscape_pasted_image_20100727_164317.png" />
+    <path
+       transform="matrix(1.1474057,0,0,0.80881692,53.097326,138.5354)"
+       style="opacity:0.31415929;fill:#00ff00;stroke:none;filter:url(#filter3897)"
+       d="m 132.72698,558.22894 c 0,8.054 -1.32474,14.58306 -2.95888,14.58306 -1.63415,0 -9.10429,-6.52906 -9.10429,-14.58306 0,-8.054 7.47014,-14.58306 9.10429,-14.58306 1.63414,0 2.95888,6.52906 2.95888,14.58306 z"
+       id="path3793"
+       sodipodi:nodetypes="csssc"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/spliter.png"
+       inkscape:export-xdpi="89.649803"
+       inkscape:export-ydpi="89.649803" />
+    <path
+       transform="matrix(0.81133835,-0.81133835,0.57191993,0.57191993,-234.04119,344.58003)"
+       style="opacity:0.2522124;fill:#ff0000;stroke:none;filter:url(#filter3893)"
+       inkscape:transform-center-x="-2.3248355"
+       inkscape:transform-center-y="6.3404605"
+       d="m 132.72698,558.22894 c 0,8.054 -1.32474,14.58306 -2.95888,14.58306 -1.63415,0 -10.06964,-5.96864 -10.06964,-14.02264 0,-8.054 8.43549,-15.14348 10.06964,-15.14348 1.63414,0 2.95888,6.52906 2.95888,14.58306 z"
+       id="path3861"
+       sodipodi:nodetypes="csssc"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/spliter.png"
+       inkscape:export-xdpi="89.649803"
+       inkscape:export-ydpi="89.649803" />
+    <path
+       transform="matrix(0.81133835,0.81133835,0.57191993,-0.57191993,-234.06214,832.64413)"
+       style="opacity:0.2522124;fill:#0000ff;stroke:none;filter:url(#filter3889)"
+       inkscape:transform-center-x="-2.3248355"
+       inkscape:transform-center-y="-6.3404591"
+       d="m 132.72698,558.22894 c 0,8.054 -1.32474,14.58306 -2.95888,14.58306 -1.63415,0 -10.26716,-8.49051 -10.26716,-16.54451 0,-8.054 8.63301,-12.62161 10.26716,-12.62161 1.63414,0 2.95888,6.52906 2.95888,14.58306 z"
+       id="path3863"
+       sodipodi:nodetypes="csssc"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/spliter.png"
+       inkscape:export-xdpi="89.649803"
+       inkscape:export-ydpi="89.649803" />
   </g>
 </svg>
