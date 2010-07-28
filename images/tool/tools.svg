@@ -721,8 +721,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.83459163"
-     inkscape:cx="268.39474"
-     inkscape:cy="660.10526"
+     inkscape:cx="364.25"
+     inkscape:cy="564.25"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="false"
@@ -789,7 +789,7 @@
        x="100.25"
        y="324.11218"
        ry="0"
-       inkscape:export-filename="/home/gre/dev/Light-Them-All/images/tool/quad.png"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/quad.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
@@ -872,7 +872,8 @@
   <g
      inkscape:groupmode="layer"
      id="layer2"
-     inkscape:label="Layer">
+     inkscape:label="Layer"
+     style="display:inline">
     <path
        style="fill:url(#linearGradient3922);fill-opacity:1;stroke:#000000;stroke-width:1.10786402px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 167.83013,140.17014 c 54.38978,14.5737 54.36261,84.1927 -0.49645,98.89214 -5.28214,-19.7132 -5.52612,-76.41559 0.49645,-98.89214 z"
@@ -913,7 +914,7 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="fill:url(#linearGradient3993);stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+       style="fill:url(#linearGradient3993);fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 590,144.86218 c -17.09621,13.96589 -33.66839,28.351 -46.07142,46.07143 12.59256,16.81881 27.46714,31.812 44.82142,44.82143 14.72208,-30.29762 13.164,-60.59524 1.25,-90.89286 z"
        id="path3945"
        sodipodi:nodetypes="cccc"
@@ -937,26 +938,26 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="opacity:0.70238096999999999;fill:#1a1a1a;fill-opacity:1;stroke:#000000;stroke-opacity:1"
+       style="fill:#5e5e5e;fill-opacity:1;stroke:#000000;stroke-opacity:1"
        d="m 113.48477,371.8571 34.63017,0 -0.0307,-33.57075 c 10.22276,-2.77207 20.60721,-4.41232 31.8291,-0.1905 l 0,33.76125 33.57143,0 c 4.59177,10.95598 4.15843,22.10523 0,33.39775 l -100,-0.0203 c -3.72906,-11.30339 -3.3375,-22.41056 0,-33.37745 z"
        id="rect3995"
        sodipodi:nodetypes="ccccccccc"
-       inkscape:export-filename="/home/gre/dev/Light-Them-All/images/tool/quad.png"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/quad.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
-       style="opacity:0.20000000000000001;fill:#ffffff;fill-opacity:1;stroke:none;filter:url(#filter4101)"
+       style="opacity:0.2;fill:#ffffff;fill-opacity:1;stroke:none;filter:url(#filter4101)"
        id="rect4003"
        width="91.4188"
        height="2.9092395"
        x="118.18785"
        y="378.2066"
        ry="1.3889598"
-       inkscape:export-filename="/home/gre/dev/Light-Them-All/images/tool/quad.png"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/quad.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
-       style="opacity:0.20000000000000001;fill:#000000;fill-opacity:1;stroke:none;filter:url(#filter4081)"
+       style="opacity:0.2;fill:#000000;fill-opacity:1;stroke:none;filter:url(#filter4081)"
        id="rect4003-6"
        width="91.4188"
        height="2.9092395"
@@ -964,7 +965,7 @@
        y="398.98035"
        ry="1.4520943"
        transform="matrix(1,0,0,1.4881745,1.7244382,-196.72314)"
-       inkscape:export-filename="/home/gre/dev/Light-Them-All/images/tool/quad.png"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/quad.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -973,7 +974,7 @@
        id="rect4000"
        sodipodi:nodetypes="ccccc"
        transform="matrix(1,0,0,0.94225542,0,19.468524)"
-       inkscape:export-filename="/home/gre/dev/Light-Them-All/images/tool/quad.png"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/quad.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
@@ -984,7 +985,7 @@
        x="148.58711"
        y="356.90372"
        ry="0"
-       inkscape:export-filename="/home/gre/dev/Light-Them-All/images/tool/quad.png"
+       inkscape:export-filename="/Volumes/dev/eclipse-workspace/Light-Them-All/assets/images/tool/quad.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -1014,7 +1015,7 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="opacity:0.10000000000000001;fill:#000000;fill-opacity:1;stroke:none;filter:url(#filter4333)"
+       style="opacity:0.1;fill:#000000;fill-opacity:1;stroke:none;filter:url(#filter4333)"
        d="m 370.16702,371.74075 -7.26452,18.16132 -46.97729,-18.88778 54.24181,0.72646 z"
        id="path4289"
        sodipodi:nodetypes="cccc"
@@ -1022,7 +1023,7 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="opacity:0.10000000000000001;fill:#000000;fill-opacity:1;stroke:none;filter:url(#filter4329)"
+       style="opacity:0.1;fill:#000000;fill-opacity:1;stroke:none;filter:url(#filter4329)"
        d="m 355.88012,408.34708 7.26452,-18.16132 46.97729,18.88778 -54.24181,-0.72646 z"
        id="path4289-5"
        sodipodi:nodetypes="cccc"
@@ -1030,7 +1031,7 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="fill:#666666;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+       style="fill:#666666;fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 523.57143,370.93361 22.32143,-22.32143 23.75,23.75 36.42857,0 0,31.07143 -38.57142,0 -25,25 -20.17858,-20.17857 18.92858,-18.92857 -17.67858,-18.39286 z"
        id="path4337"
        inkscape:export-filename="/home/gre/dev/Light-Them-All/images/tool/triangle.png"
@@ -1038,7 +1039,7 @@
        inkscape:export-ydpi="90" />
     <path
        transform="matrix(0.36195477,0,0,1,377.58758,3.9285714)"
-       style="opacity:0.20000000000000001;fill:#ffffff;fill-opacity:1;stroke:none;filter:url(#filter4507)"
+       style="opacity:0.2;fill:#ffffff;fill-opacity:1;stroke:none;filter:url(#filter4507)"
        d="m 461.86432,352.6933 61.34113,21.42856 99.32927,0 c 0.76949,0 1.38896,0.61947 1.38896,1.38896 l 0,0.13132 c 0,0.76948 -0.61947,1.38896 -1.38896,1.38896 -28.83403,0 -80.4325,0.59438 -105.68814,0.59438 L 454.0254,355.15162 c -2.05926,-1.06198 5.6262,-3.18393 7.83892,-2.45832 z"
        id="rect4003-3"
        sodipodi:nodetypes="ccccccccc"
@@ -1047,7 +1048,7 @@
        inkscape:export-ydpi="90" />
     <path
        transform="matrix(0.36195477,0,0,-1.0085735,376.72474,777.55236)"
-       style="opacity:0.20000000000000001;fill:#000000;fill-opacity:1;stroke:none;filter:url(#filter4511)"
+       style="opacity:0.2;fill:#000000;fill-opacity:1;stroke:none;filter:url(#filter4511)"
        d="m 461.86432,352.6933 61.34113,21.42856 99.32927,0 c 0.76949,0 1.38896,0.61947 1.38896,1.38896 l 0,0.13132 c 0,0.76948 -0.61947,1.38896 -1.38896,1.38896 -28.83403,0 -80.4325,0.59438 -105.68814,0.59438 L 454.0254,355.15162 c -2.05926,-1.06198 5.6262,-3.18393 7.83892,-2.45832 z"
        id="rect4003-3-0"
        sodipodi:nodetypes="ccccccccc"
@@ -1080,7 +1081,7 @@
        xlink:href="/Applications/Inkscape.app/inkscape_pasted_image_20100727_164317.png" />
     <path
        transform="matrix(1.1474057,0,0,0.80881692,53.097326,138.5354)"
-       style="opacity:0.31415929;fill:#00ff00;stroke:none;filter:url(#filter3897)"
+       style="opacity:0.31415938;fill:#00ff00;stroke:none;filter:url(#filter3897)"
        d="m 132.72698,558.22894 c 0,8.054 -1.32474,14.58306 -2.95888,14.58306 -1.63415,0 -9.10429,-6.52906 -9.10429,-14.58306 0,-8.054 7.47014,-14.58306 9.10429,-14.58306 1.63414,0 2.95888,6.52906 2.95888,14.58306 z"
        id="path3793"
        sodipodi:nodetypes="csssc"

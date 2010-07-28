@@ -31,6 +31,7 @@
     });
     </script>
     
+    <script src="javascripts/json2.js" type="text/javascript"></script>
     <script src="javascripts/types.js" type="text/javascript"></script>
     <script src="javascripts/main.js" type="text/javascript"></script>
   </head>
@@ -41,11 +42,12 @@
         <h1>Light Them All</h1>
       </div>
       <ul class="rounded">
+        <li class="continueGame destroyIfNoContinuableGame">
+          <a class="continueGame" href="#play">Resume</a>
+          <span class="date"></span>
+        </li>
         <li>
           <a class="newGame" href="#play">New Game</a>
-        </li>
-        <li class="destroyIfNoContinuableGame">
-          <a class="continueGame" href="#play">Continue</a>
         </li>
         <li>
           <a href="#help">Help</a>

@@ -1,3 +1,7 @@
+li.continueGame .date {
+  float: right;
+}
+
 #resources {
   display: none;
   position: absolute;

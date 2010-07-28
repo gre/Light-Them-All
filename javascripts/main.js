@@ -127,8 +127,9 @@
         return this;
       },
       number: function(n) {
+        if(typeof(n)=="undefined") return getNumber();
         setNumber(n);
-        return this;
+        return n;
       },
       decr: function() {
         var val = getNumber();
@@ -324,6 +325,7 @@
         obj = eval(appendScript+'('+data+')');
       }
       catch(e) {
+        console.log(e);
         return {};
       }
       return obj;
@@ -434,82 +436,82 @@
     /// Algorithmic part
     
     
-    /*
-     * @arg rays : [ { orientation, color, points }, ... ]
-     */
-    var rayExists = function(position, color, orientation, rays) {
-      var reverseOrientation = (4+orientation)%8;
-      for(var r in rays) {
-        var ray = rays[r];
-        if(ray.color==color) {
-          if(orientation==ray.orientation) {
-            if(casePosEquals(ray.points[0], position))
-              return true;
+    var traceRay = function(laserCase) {
+      
+      var lasers = [];
+      
+      /*
+       * @arg rays : [ { orientation, color, points }, ... ]
+       */
+      var rayExists = function(points, color, rays) {
+        for(var r in rays) {
+          var ray = rays[r];
+          if(ray.color==color && casePosEquals(ray.points[0], points[0]) && casePosEquals(ray.points[1], points[1]))
+            return true;
+        }
+        return false;
+      }
+      
+      var rec_traceRay = function(caseObj, laserOrientation, color) {
+        var originalCasePos = getCasePos(caseObj);
+        var laser = {
+          orientation: laserOrientation,
+          color: color,
+          points: [originalCasePos]
+        };
+        var traces = [];
+        
+        var pos;
+        var nextCase = caseObj;
+        var currentCase = caseObj;
+        var role = "empty";
+        while(nextCase) {
+          var nextCaseNode = getNextCase(nextCase.node(), laser.orientation); // TODO : getNextCase doit retourner les coordonnées la prochaine case meme si elle n'existe pas, en revanche on met obj à null et on quitte à la fin de la boucle
+          nextCase = nextCaseNode ? new Case(nextCaseNode) : null;
+          pos = getCasePos(currentCase);
+          
+          if(role=="tool") {
+            var tool = currentCase.tooltype();
+            var caseOrientation = parseInt(currentCase.orientation());
+            var relativeCaseOrientation = (-caseOrientation+laser.orientation+7)%8; // todo use a function
+            
+            var output = types.ToolProperties[tool].ray(relativeCaseOrientation, color);
+            
+            var currentCasePos = getCasePos(currentCase);
+            for(var o in output) {
+              var orientation = (5 +caseOrientation + parseInt(o))%8;
+              var color = output[o];
+              if(!rayExists([originalCasePos, currentCasePos], color, lasers))
+                traces.push([currentCase, orientation, color, lasers]);
+            }
           }
-          else if(reverseOrientation==ray.orientation) {
-            if(casePosEquals(ray.points[1], position))
-              return true;
+          else if(role=="bomb") {
+            bomb_touched = true;
+          }
+          else if(role=="receptor") {
+            // TODO
+          }
+          
+          if(role!="empty") {
+            nextCase = null;
+          }
+          
+          if(nextCase) {
+            role = nextCase.role();
+            currentCase = nextCase;
           }
         }
-      }
-      return false;
-    }
-    
-    var rec_traceRay = function(caseObj, laserOrientation, color, lasers) {
-      var laser = {
-        orientation: laserOrientation,
-        color: color,
-        points: [getCasePos(caseObj)]
+        if(pos) {
+          laser.points.push(pos);
+          lasers.push(laser);
+          for(var t in traces) {
+            rec_traceRay.apply(this, traces[t]);
+          }
+        }
       };
-      var pos;
-      var nextCase = caseObj;
-      var currentCase = caseObj;
-      var role = "empty";
-      while(nextCase) {
-        var nextCaseNode = getNextCase(nextCase.node(), laser.orientation);
-        nextCase = nextCaseNode ? new Case(nextCaseNode) : null;
-        pos = getCasePos(currentCase);
-        
-        if(role=="tool") {
-          var tool = currentCase.tooltype();
-          var caseOrientation = parseInt(currentCase.orientation());
-          var relativeCaseOrientation = (-caseOrientation+laser.orientation+7)%8; // todo use a function
-          
-          var output = types.ToolProperties[tool].ray(relativeCaseOrientation, color);
-          
-          var currentCasePos = getCasePos(currentCase);
-          for(var o in output) {
-            var orientation = (5 +caseOrientation + parseInt(o))%8;
-            var color = output[o];
-            if(!rayExists(currentCasePos, color, orientation, lasers)) {
-              //console.log('not exists');
-              rec_traceRay(currentCase, orientation, color, lasers);
-            }
-            else {
-              //console.log('exists');
-            }
-          }
-        }
-        else if(role=="bomb") {
-          bomb_touched = true;
-        }
-        else if(role=="receptor") {
-          // TODO
-        }
-        
-        if(role!="empty") {
-          nextCase = null;
-        }
-        
-        if(nextCase) {
-          role = nextCase.role();
-          currentCase = nextCase;
-        }
-      }
-      if(pos) {
-        laser.points.push(pos);
-        lasers.push(laser);
-      }
+      
+    
+      rec_traceRay(laserCase, laserCase.orientation(), laserCase.color());
       return lasers;
     };
     
@@ -519,9 +521,7 @@
       $('.case[role=laser]').each(function(){
         var laserNode = $(this);
         var laserCase = new Case(laserNode);
-        var orientation = laserCase.orientation();
-        var color = laserCase.color();
-        var lasersForThisRay = rec_traceRay(laserCase, orientation, color, []);
+        var lasersForThisRay = traceRay(laserCase);
         lasers = joinArray(lasers, lasersForThisRay);
       });
       return computedLasers = lasers;
@@ -619,42 +619,26 @@
     return {
       getCaseNode: getCaseNode,
       getCase: getCase,
-      start: function(level) {
+      start: function(level, placedTools) {
+        if(!placedTools) placedTools = [];
         g_playable = false;
         var game = $('#game');
         
+        var getPlacedTool = function(x, y) {
+          for(var p in placedTools) {
+            var placedTool = placedTools[p];
+            if(placedTool.x == x && placedTool.y == y) {
+              return placedTool;
+            }
+          }
+          return null;
+        };
         
         Popup.open("<h1>Chargement...</h1>");
         Level.getGrid(level, function(lvl){
           $('#play .toolbar h1').text(lvl.name||'Game');
           grid = lvl.grid;
           tools = lvl.tools;
-          var i = 0;
-          for(var y=0; y<gridSize.h; ++y) {
-            for(var x=0; x<gridSize.w; ++x) {
-              var ctx = getCase(x, y);
-              var caseObj = grid[i];
-              switch(caseObj.mapObject) {
-                case types.MapObject.RECEPTOR:
-                  new Case(ctx).receptor(caseObj.color);
-                break;
-                case types.MapObject.LASER:
-                  new Case(ctx).laser(caseObj.color, caseObj.orientation);
-                break;
-                case types.MapObject.WALL:
-                  new Case(ctx).wall();
-                break;
-                case types.MapObject.BOMB:
-                  new Case(ctx).bomb();
-                break;
-                default:
-                  new Case(ctx).empty();
-              }
-              ++i;
-            }
-          }
-          
-          RayTracer.trace();
           
           $('#game .gamePanel .toolObjectContainer').hide().empty();
           
@@ -674,6 +658,45 @@
             var tool = tools[t];
             new PanelObject($('#game .gamePanel .toolObjectContainer').eq(i++)).init(tool.type).number(tool.number);
           }
+          
+          var i = 0;
+          for(var y=0; y<gridSize.h; ++y) {
+            for(var x=0; x<gridSize.w; ++x) {
+              var ctx = getCase(x, y);
+              var caseObj = grid[i];
+              switch(caseObj.mapObject) {
+                case types.MapObject.RECEPTOR:
+                  new Case(ctx).receptor(caseObj.color);
+                break;
+                case types.MapObject.LASER:
+                  new Case(ctx).laser(caseObj.color, caseObj.orientation);
+                break;
+                case types.MapObject.WALL:
+                  new Case(ctx).wall();
+                break;
+                case types.MapObject.BOMB:
+                  new Case(ctx).bomb();
+                break;
+                default:
+                  var c = new Case(ctx);
+                  c.empty();
+                  var placedTool = getPlacedTool(x, y);
+                  if(placedTool) {
+                    var toolNodeContainer = $('#game .toolObject[tooltype='+placedTool.tooltype+']:first').parents('.toolObjectContainer:first');
+                    if(toolNodeContainer.size()>0) {
+                      var panelObject = new PanelObject(toolNodeContainer);
+                      if(panelObject.number()>0) {
+                        c.tool(placedTool.tooltype, placedTool.orientation);
+                        panelObject.decr();
+                      }
+                    }
+                  }
+              }
+              ++i;
+            }
+          }
+          
+          RayTracer.trace();
           
           $(window).resize();
           
@@ -899,15 +922,54 @@
         bindEvents();
       },
       
-      start: function(level) {
+      start: function(level, tools) {
         if(!level) level=1;
-        GameGrid.start(level);
+        GameGrid.start(level, tools);
         Popup.close();
       }
     }
   }();
   
   var Main = lta.Main = function(){
+    
+    var getCurrentContinuableGame = function() {
+      var continuableGame = { 
+        timestamp: new Date().getTime(),
+        level: g_currentLevel, 
+        tools: [] 
+      };
+      $('#game .cases .case[role=tool]').each(function(){
+        var c = new Case($(this));
+        continuableGame.tools.push({
+          x: c.x(),
+          y: c.y(),
+          orientation: c.orientation(),
+          tooltype: c.tooltype()
+        });
+      });
+      return continuableGame;
+    };
+    
+    var storeContinuableGame = function(continuableGame) {
+      return localStorage.setItem('continuableGame', JSON.stringify(continuableGame));
+    };
+    var retrieveContinuableGame = function() {
+      return JSON.parse(localStorage.getItem('continuableGame'));
+    };
+    
+    var updateMenus = function() {
+      var continuableGame = retrieveContinuableGame();
+      if(!continuableGame) {
+        $('.destroyIfNoContinuableGame').hide();
+      }
+      else {
+        $('.destroyIfNoContinuableGame').show();
+        if(continuableGame.timestamp) {
+          var date = new Date(continuableGame.timestamp);
+          $('li.continueGame .date').text(date.toString());
+        }
+      }
+    };
     
     return {
       init: function(){
@@ -917,21 +979,31 @@
         
         Game.init();
         
-        var continuableGame = localStorage.getItem('continuableGame');
-        if(!continuableGame) {
-          $('.destroyIfNoContinuableGame').remove();
-        }
-        else {
-          $('a.continueGame').click(function(){
-            continuableGame = localStorage.getItem('continuableGame');
-            Game.start(continuableGame.level);
-          });
-        }
-        $('a.newGame').click(function(){
-          Game.start();
+        $('#home').bind('pageAnimationEnd', function(event, info){
+          updateMenus();
+        });
+        updateMenus();
+        
+        $('a.continueGame').click(function(){
+          var continuableGame = retrieveContinuableGame();
+          console.log(continuableGame);
+          Game.start(continuableGame.level, continuableGame.tools);
         });
         
+        $('a.newGame').click(function(){
+          var continuableGame = retrieveContinuableGame();
+          if(!continuableGame || confirm("Cancel last saved game ?")) {
+            Game.start();
+          }
+          else {
+            return false;
+          }
+          // TODO store foreach new level // storeContinuableGame({ level: 1, tools: [] });
+        });
         
+        $('#game').bind('gridChanged', function(){
+          storeContinuableGame(getCurrentContinuableGame());
+        });
       }
     }
   }();
