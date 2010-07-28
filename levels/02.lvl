@@ -1,0 +1,48 @@
+{
+  name: "Level 1 - Hello world",
+  description: "Here you are",
+  
+  grid: [
+    laser(R, BOTTOMRIGHT), empty, laser(B, BOTTOM), empty,        empty,  empty, empty,       empty, empty, laser(G, BOTTOMLEFT),
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,       empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
+    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty
+  ],
+  
+  tools: [
+    {
+      type: SIMPLE,
+      number: 2
+    },
+    {
+      type: DOUBLE,
+      number: 3
+    },
+    {
+      type: REFRACTOR,
+      number: 1
+    },
+    {
+      type: CONE,
+      number: 2
+    },
+    {
+      type: QUAD,
+      number: 1
+    },
+    {
+      type: TRIANGLE,
+      number: 3
+    },
+    {
+      type: SPLITER,
+      number: 1
+    }
+  ]
+}

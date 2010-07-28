@@ -703,7 +703,8 @@
           Popup.level(lvl, function(){
             g_currentLevel = level;
             g_playable = true;
-          });
+            Main.saveCurrentGame();
+          }, (placedTools.length>0));
         });
       },
       
@@ -760,10 +761,13 @@
         '<p>You exploded a bomb.</p>'+
         '<p class="buttons"><a href="javascript: lta.Game.start('+g_currentLevel+');">Try again</a></p>');
       },
-      level: function(lvl, callback) {
+      winLevel: function(lvl, callback) {
+      
+      },
+      level: function(lvl, callback, continueMode) {
         var h1 = $('<h1/>').text(lvl.name||'');
         var description = $('<p class="description" />').text(lvl.description||'');
-        var startLevelLink = $('<a href="javascript:;">Start level</a>');
+        var startLevelLink = $('<a href="javascript:;">'+(continueMode ? 'Continue' : 'Start')+' level</a>');
         openPopup($().after(h1).after(description).after($('<p class="buttons" />').append(startLevelLink)));
         if(callback) {
           startLevelLink.click(function(){
@@ -964,14 +968,17 @@
       }
       else {
         $('.destroyIfNoContinuableGame').show();
+        $('li.continueGame .date').empty();
         if(continuableGame.timestamp) {
-          var date = new Date(continuableGame.timestamp);
-          $('li.continueGame .date').text(date.toString());
+          $('li.continueGame .date').text('played '+prettyDate(new Date(continuableGame.timestamp)));
         }
       }
     };
     
     return {
+      saveCurrentGame: function() {
+        storeContinuableGame(getCurrentContinuableGame());
+      },
       init: function(){
         g_width = $(window).width();
         if(g_width<480) g_width = 320;
@@ -986,7 +993,6 @@
         
         $('a.continueGame').click(function(){
           var continuableGame = retrieveContinuableGame();
-          console.log(continuableGame);
           Game.start(continuableGame.level, continuableGame.tools);
         });
         
