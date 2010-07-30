@@ -1,6 +1,6 @@
 {
-  name: "Level 1 - Hello world",
-  description: "Here you are",
+  name: "Level 2 - hehe",
+  description: "hehe",
   
   grid: [
     laser(R, BOTTOMRIGHT), empty, laser(B, BOTTOM), empty,        empty,  empty, empty,       empty, empty, laser(G, BOTTOMLEFT),

@@ -343,8 +343,8 @@
     };
     
     return {
-      hasNext: function(level) {
-        return level<10; // todo
+      exists: function(level) {
+        return level<3; // todo
       },
       getGrid: getGrid
     }
@@ -700,7 +700,7 @@
           
           $(window).resize();
           
-          Popup.level(lvl, function(){
+          Popup.levelStart(lvl, function(){
             g_currentLevel = level;
             g_playable = true;
             Main.saveCurrentGame();
@@ -761,10 +761,18 @@
         '<p>You exploded a bomb.</p>'+
         '<p class="buttons"><a href="javascript: lta.Game.start('+g_currentLevel+');">Try again</a></p>');
       },
-      winLevel: function(lvl, callback) {
-      
+      levelWin: function() {
+        var content = '<h1>Success</h1>';
+        if(Level.exists(g_currentLevel+1)) {
+          content += '<p class="buttons"><a href="javascript: lta.Game.start('+(g_currentLevel+1)+');">next level</a></p>';
+        }
+        else {
+          content += '<p>You have finished all levels !</p>';
+        }
+        
+        openPopup(content);
       },
-      level: function(lvl, callback, continueMode) {
+      levelStart: function(lvl, callback, continueMode) {
         var h1 = $('<h1/>').text(lvl.name||'');
         var description = $('<p class="description" />').text(lvl.description||'');
         var startLevelLink = $('<a href="javascript:;">'+(continueMode ? 'Continue' : 'Start')+' level</a>');
