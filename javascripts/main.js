@@ -266,19 +266,37 @@
         drawImage($('#image_bomb')[0]);
         ctx.fill();
       },
-      receptor: function(c){
+      receptor: function(c, rayOver){
         if(typeof(c)=='undefined') c = color();
+        var currentRayAttr = node.attr('ray');
+        var newRayAttr = rayOver ? 'on' : 'off';
+        if(c==color() && currentRayAttr == newRayAttr) return;
+        node.attr('ray', newRayAttr);
         empty();
         role('receptor');
         color(c);
-        style(types.Color.rgba(c));
+        if(rayOver) {
+          ctx.shadowColor = types.Color.rgba(c, 400);
+          ctx.shadowBlur = 5;
+          style(types.Color.rgba(c),1,300);
+        }
+        else {
+          style(types.Color.rgba(c),1,250);
+        }
         ctx.beginPath();
         ctx.arc(caseSize.w/2, caseSize.h/2, caseSize.h/2-4, 0, Math.PI*2, true);
         ctx.fill();
-        style(types.Color.rgba(c,1,200));
+        if(rayOver) {
+          ctx.shadowBlur = caseSize.w/4;
+          ctx.shadowColor = types.Color.rgba(c, 400);
+          style(types.Color.rgba(c,0.8,350));
+        }
+        else
+          style(types.Color.rgba(c,0.8,200));
         ctx.beginPath();
         ctx.arc(caseSize.w/2, caseSize.h/2, caseSize.h/4, 0, Math.PI*2, true);
         ctx.fill();
+        ctx.shadowBlur = 0;
       },
       laser: function(c, o){
         if(typeof(o)=='undefined') o = orientation();
@@ -441,6 +459,8 @@
       
       var lasers = [];
       
+      var receptors = [];
+      
       /*
        * @arg rays : [ { orientation, color, points }, ... ]
        */
@@ -490,7 +510,10 @@
             bomb_touched = true;
           }
           else if(role=="receptor") {
-            // TODO
+            if(laser.color==currentCase.color()) {
+              receptors.push(currentCase);
+              currentCase.receptor(currentCase.color(), true);
+            }
           }
           
           if(role!="empty") {
@@ -510,9 +533,19 @@
           }
         }
       };
-      
     
       rec_traceRay(laserCase, laserCase.orientation(), laserCase.color());
+      
+      $('#game .case[role=receptor]').each(function(){
+        var receptor = new Case($(this));
+        var x = receptor.x();
+        var y = receptor.y();
+        for(var i in receptors)
+          if(receptors[i].x()==x && receptors[i].y()==y)
+            return;
+        receptor.receptor(receptor.color(), false);
+      });
+      
       return lasers;
     };
     
@@ -534,6 +567,9 @@
       drawLasers(computedLasers);
       if(bomb_touched)
         Popup.bomb();
+      if( $('#game .case[role=receptor][ray=off]').size()==0 ) {
+        Popup.levelWin();
+      }
     };
     
     return {
