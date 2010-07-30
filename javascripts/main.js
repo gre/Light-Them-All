@@ -314,6 +314,7 @@
       var appendScript = 'for(var v in types.Orientation) this[v]=types.Orientation[v];'+
       'for(var v in types.Color) this[v]=types.Color[v];'+
       'for(var v in types.ToolType) this[v]=types.ToolType[v];'+
+      'var Tool = function(x, y, tool){ this.x = x; this.y = y; for(var k in tool) this[k] = tool[k]; };'+
       'var empty=0;'+
       'var bomb=function(){ return { mapObject: types.MapObject.BOMB } };'+
       'var receptor=function(c){ return { mapObject: types.MapObject.RECEPTOR, color: c } };'+
@@ -637,7 +638,16 @@
         Popup.open("<h1>Chargement...</h1>");
         Level.getGrid(level, function(lvl){
           $('#play .toolbar h1').text(lvl.name||'Game');
-          grid = lvl.grid;
+          grid = [];
+          for(var i=0; i<gridSize.h*gridSize.w; ++i) {
+            grid[i] = 0;
+          }
+          for(var i in lvl.grid) {
+            var tool = lvl.grid[i];
+            if(tool.x>=0 && tool.y>=0 && tool.x<gridSize.w && tool.y<gridSize.h)
+              grid[tool.x + tool.y*gridSize.w] = tool;
+          }
+          
           tools = lvl.tools;
           
           $('#game .gamePanel .toolObjectContainer').hide().empty();

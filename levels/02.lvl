@@ -1,47 +1,21 @@
 {
-  name: "Level 2 - hehe",
-  description: "hehe",
+  name: "Level 2 - Spliting rays",
+  description: "One source. Three receptors.",
   
   grid: [
-    laser(R, BOTTOMRIGHT), empty, laser(B, BOTTOM), empty,        empty,  empty, empty,       empty, empty, laser(G, BOTTOMLEFT),
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,       empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty
+    new Tool(4, 0, laser(G, BOTTOM)),
+    new Tool(9, 6, receptor(G)),
+    new Tool(6, 9, receptor(G)),
+    new Tool(0, 6, receptor(G))
   ],
   
   tools: [
     {
-      type: SIMPLE,
-      number: 2
-    },
-    {
-      type: DOUBLE,
-      number: 3
-    },
-    {
-      type: REFRACTOR,
-      number: 1
-    },
-    {
       type: CONE,
-      number: 2
+      number: 1
     },
     {
       type: QUAD,
-      number: 1
-    },
-    {
-      type: TRIANGLE,
-      number: 3
-    },
-    {
-      type: SPLITER,
       number: 1
     }
   ]

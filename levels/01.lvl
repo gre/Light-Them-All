@@ -1,47 +1,15 @@
 {
-  name: "Level 1 - Hello world",
-  description: "Here you are",
+  name: "Level 1 - Getting started",
+  description: "Mirror is the key.",
   
   grid: [
-    laser(R, BOTTOMRIGHT), empty, laser(B, BOTTOM), empty,        empty,  empty, empty,       empty, empty, laser(G, BOTTOMLEFT),
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,       empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty,
-    empty,                 empty, empty, empty,        empty,  empty,            empty,       empty, empty, empty
+    new Tool(0, 4, laser(R, RIGHT)),
+    new Tool(6, 9, receptor(R))
   ],
   
   tools: [
     {
       type: SIMPLE,
-      number: 2
-    },
-    {
-      type: DOUBLE,
-      number: 3
-    },
-    {
-      type: REFRACTOR,
-      number: 1
-    },
-    {
-      type: CONE,
-      number: 2
-    },
-    {
-      type: QUAD,
-      number: 1
-    },
-    {
-      type: TRIANGLE,
-      number: 3
-    },
-    {
-      type: SPLITER,
       number: 1
     }
   ]
