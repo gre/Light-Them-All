@@ -671,7 +671,6 @@
           return null;
         };
         
-        Popup.open("<h1>Chargement...</h1>");
         Level.getGrid(level, function(lvl){
           grid = [];
           for(var i=0; i<gridSize.h*gridSize.w; ++i) {
@@ -780,11 +779,22 @@
     
     var oldPlayable = null;
     
-    var openPopup = function(content) {
+    var openPopup = function(o) {
       oldPlayable = g_playable;
       g_playable = false;
-      if(!content) content = "";
-      g_popup.empty().append($('<div class="content" />').width(g_width-40).append(content)).show();
+      var settings = $.extend({
+        title: "",
+        content: "",
+        links: []}, o);
+      var buttons = $('<p class="buttons" />');
+      for(var l in settings.links)
+        buttons.append(settings.links[l]);
+      g_popup.empty().append($('<div class="content" />')
+                              .width(g_width-40)
+                              .append($('<h1 />').text(settings.title))
+                              .append($('<div />').html(settings.content))
+                              .append(buttons))
+                              .show();
     };
     
     var close = function(){
@@ -797,38 +807,52 @@
         g_popup = $("#popup");
         close();
       },
-      open: function(content) {
-        openPopup(content);
-      },
       bomb: function() {
-        openPopup('<h1>Failure</h1>'+
-        '<p>You exploded a bomb.</p>'+
-        '<p class="buttons"><a href="javascript: lta.Game.start('+g_currentLevel+');">Try again</a></p>');
+        var tryAgain = $('<a href="javascript:;">Try again</a>').click(function(){
+          lta.Game.start(g_currentLevel);
+        });
+        openPopup({
+          title: 'Failure',
+          content: '<p>You exploded a bomb.</p>',
+          links: [tryAgain]
+        });
       },
       levelWin: function() {
-        $('#play .toolbar h1').text('Level '+g_currentLevel+' succeed');
-        var content = '<h1>Success</h1>';
-        if(Level.exists(g_currentLevel+1)) {
-          content += '<p class="buttons"><a href="javascript: lta.Game.start('+(g_currentLevel+1)+');">next level</a></p>';
-        }
-        else {
-          content += '<p>You have finished all levels !</p>';
-        }
-        
-        openPopup(content);
+        var nextLevel = $('<a href="javascript:;">Next level</a>').click(function(){
+          lta.Game.start(g_currentLevel+1);
+        });
+        var hasNextLevel = Level.exists(g_currentLevel+1);
+        openPopup({
+          title: 'Success',
+          content: hasNextLevel ? '<p>You have succeed the level.</p>' : '<p>You have finished all levels !</p>',
+          links: hasNextLevel ? [nextLevel] : []
+        });
       },
       levelStart: function(lvl, callback, continueMode) {
         $('#play .toolbar h1').text('');
-        var h1 = $('<h1/>').text(lvl.name||'');
-        var description = $('<p class="description" />').text(lvl.description||'');
         var startLevelLink = $('<a href="javascript:;">'+(continueMode ? 'Continue' : 'Start')+' level</a>');
-        openPopup($().after(h1).after(description).after($('<p class="buttons" />').append(startLevelLink)));
-        if(callback) {
-          startLevelLink.click(function(){
-            close();
+        startLevelLink.click(function(){
+          close();
+          if(callback)
             callback();
-          });
-        }
+        });
+        openPopup({
+          title: lvl.name,
+          content: lvl.description,
+          links: [startLevelLink]
+        });
+      },
+      confirmNewGame: function(callback){
+        $('#game .gameGrid, #game .gamePanel').hide();
+        var onYesClick = function(){
+          $('#game .gameGrid, #game .gamePanel').show();
+          if(callback) callback();
+        };
+        
+        openPopup({
+          title: 'Cancel last saved game?',
+          links: [$('<a href="#home">No</a>'), $('<a href="javascript:;">Yes</a>').click(onYesClick)]
+        });
       },
       close: function() {
         close();
@@ -980,7 +1004,7 @@
         bindEvents();
       },
       
-      start: function(level, tools) { console.log('game '+level);
+      start: function(level, tools) {
         if(!level) level=1;
         GameGrid.start(level, tools);
         Popup.close();
@@ -1013,6 +1037,9 @@
     };
     var retrieveContinuableGame = function() {
       return JSON.parse(localStorage.getItem('continuableGame'));
+    };
+    var removeContinuableGame = function() {
+      localStorage.removeItem('continuableGame');
     };
     
     var storeReachLevel = function(reachLevel) {
@@ -1056,15 +1083,13 @@
           storeContinuableGame(getCurrentContinuableGame());
         });
 
-        
-        $('#home').bind('pageAnimationEnd', function(event, info){
+        $('#home').bind('pageAnimationStart', function(event, info){
           if(info.direction=="in")
             updateMenus();
         });
-        updateMenus();
+        updateMenus();        
         
         $('#play').bind('pageAnimationStart', function(event, info) { 
-          console.log(arguments)
           if(info.direction=="in") {
             var referrer = $($(this).data('referrer'));
             var continuableGame = retrieveContinuableGame();
@@ -1072,12 +1097,14 @@
               Game.start(continuableGame.level, continuableGame.tools);
             }
             else if(referrer.is('.newGame')) {
-              var continuableGame = retrieveContinuableGame();
-              if(!continuableGame || confirm("Cancel last saved game ?")) {
+              if(!continuableGame) {
                 Game.start();
               }
               else {
-                
+                Popup.confirmNewGame(function(){
+                  removeContinuableGame();
+                  Game.start();
+                });
               }
             }
           }
