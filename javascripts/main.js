@@ -1,6 +1,6 @@
 (function(){
   
-  if(!console) console = { log: function(){} };
+  if(!console) console = { log: function(){}, error: function(){} };
   
   var isChrome = /chrome/i.test(navigator.userAgent);
   var isAndroidOS = /android/i.test(navigator.userAgent);
@@ -848,7 +848,6 @@
           $('#game .gameGrid, #game .gamePanel').show();
           if(callback) callback();
         };
-        
         openPopup({
           title: 'Cancel last saved game?',
           links: [$('<a href="#home">No</a>'), $('<a href="javascript:;">Yes</a>').click(onYesClick)]
@@ -884,7 +883,8 @@
         new Sound('#audio_turn').play();
       });
       
-      Event.touchstart(function(e) { 
+      Event.touchstart(function(e) {
+        e.preventDefault();
         if(!g_playable) return;
         var node = $(e.target);
           
@@ -906,12 +906,12 @@
           var c = new Case(node);
           if(c.role()=='tool') {
             node.addClass('touching');
-            e.preventDefault();
           }
         }
       });
       
-      Event.touchend(function(e){  
+      Event.touchend(function(e){
+        e.preventDefault();
         if(!g_playable) return;
         var target = $(e.target);
         var dragging = $('#game .dragging');
@@ -1107,6 +1107,12 @@
                 });
               }
             }
+          }
+        });
+        
+        $('#play').bind('pageAnimationStart', function(event, info) { 
+          if(info.direction=="in") {
+            
           }
         });
         

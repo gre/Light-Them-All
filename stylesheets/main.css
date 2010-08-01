@@ -1,3 +1,10 @@
+body {
+   -moz-user-select: none;
+   -khtml-user-select: none;
+   user-select: none;
+   height: 100%;
+   overflow: hidden;
+}
 
 li.continueGame .date {
   float: right;
