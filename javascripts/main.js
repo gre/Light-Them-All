@@ -324,41 +324,9 @@
   
   var Level = lta.Level = function() {
     
-    var level2file = function(level) {
-      return 'levels/'+(level<10?'0':'')+level+'.lvl';
-    }
-    
-    var parseLevel = function(data) {
-      var appendScript = 'for(var v in types.Orientation) this[v]=types.Orientation[v];'+
-      'for(var v in types.Color) this[v]=types.Color[v];'+
-      'for(var v in types.ToolType) this[v]=types.ToolType[v];'+
-      'var Tool = function(x, y, tool){ this.x = x; this.y = y; for(var k in tool) this[k] = tool[k]; };'+
-      'var empty=0;'+
-      'var bomb=function(){ return { mapObject: types.MapObject.BOMB } };'+
-      'var receptor=function(c){ return { mapObject: types.MapObject.RECEPTOR, color: c } };'+
-      'var laser=function(c,o){ return { mapObject: types.MapObject.LASER, color: c, orientation: o } };'+
-      'var wall=function(){ return { mapObject: types.MapObject.WALL } };';
-      
-      var obj;
-      try {
-        obj = eval(appendScript+'('+data+')');
-      }
-      catch(e) {
-        console.log(e);
-        return {};
-      }
-      return obj;
-    };
-    
-    getGrid = function(level, callback) {
-      $.get(level2file(level), function(data) {
-        var level = parseLevel(data);
-        if($.isEmptyObject(level)) {
-          console.log('Unable to parse level.');
-        }
-        else
-          callback(level);
-      });
+    var getGrid = function(level, callback) {
+      var level = data_levels[level-1];
+      callback(level);
     };
     
     return {
@@ -569,6 +537,7 @@
         Popup.bomb();
       if( $('#game .case[role=receptor][ray=off]').size()==0 ) {
         Popup.levelWin();
+        $('#game').trigger('levelWin');
       }
     };
     
@@ -671,7 +640,7 @@
           return null;
         };
         
-        Level.getGrid(level, function(lvl){
+        Level.getGrid(level, function(lvl){ 
           grid = [];
           for(var i=0; i<gridSize.h*gridSize.w; ++i) {
             grid[i] = 0;
@@ -1006,8 +975,28 @@
       
       start: function(level, tools) {
         if(!level) level=1;
-        GameGrid.start(level, tools);
         Popup.close();
+        GameGrid.start(level, tools);
+      }
+    }
+  }();
+  
+  var Levels = lta.Levels = function() {
+    var g_maxLevel = 1;
+    
+    var init = function() {
+      var levelList = $('#level .levelList');
+      levelList.empty();
+      for(var i = 1; i<=g_maxLevel; ++i) {
+        var level = ('<li class="level"></li>');
+        levelList.append(level);
+      }
+    };
+    
+    return {
+      init: function(maxLevel) {
+        if(maxLevel) g_maxLevel = maxLevel;
+        init();
       }
     }
   }();
@@ -1076,6 +1065,12 @@
         
         Game.init();
         
+        safeStoreReachLevel(1); // minimum level is level 1
+        
+        $('#game').bind('levelWin', function(){
+          safeStoreReachLevel(g_currentLevel);
+        });
+        
         $('#game').bind('levelStarted', function(){
           $('#play .toolbar h1').text('Level '+g_currentLevel);
         });
@@ -1097,22 +1092,14 @@
               Game.start(continuableGame.level, continuableGame.tools);
             }
             else if(referrer.is('.newGame')) {
-              if(!continuableGame) {
-                Game.start();
-              }
-              else {
-                Popup.confirmNewGame(function(){
-                  removeContinuableGame();
-                  Game.start();
-                });
-              }
+              Game.start();
             }
           }
         });
         
-        $('#play').bind('pageAnimationStart', function(event, info) { 
+        $('#level').bind('pageAnimationStart', function(event, info) { 
           if(info.direction=="in") {
-            
+            Levels.init(retrieveReachLevel() || 1);
           }
         });
         
