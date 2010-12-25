@@ -19,35 +19,16 @@
   var gridSize = { w: 10, h: 10 };
   
   var Event = lta.Event = function() {
-    
     var useTouch = hasTouch && !isChrome;
-    var target = document;
-    
-    var touchstart, touchmove, touchend;
-    
-    if(useTouch) {
-      touchstart = function(fn) {
-        $(target).bind('touchstart', fn);
-      };
-      touchmove = function(fn) {
-        $(target).bind('touchmove', fn);
-      };
-      touchend = function(fn) {
-        $(target).bind('touchend', fn);
-      };
-    }
-    else {
-      touchstart = function(fn) {
-        $(document).bind('mousedown', fn);
-      };
-      touchmove = function(fn) {
-        $(document).bind('mousemove', fn);
-      };
-      touchend = function(fn) {
-        $(document).bind('mouseup', fn);
-      };
-    }
-        
+    var touchstart = function(fn) {
+      document.addEventListener(useTouch ? 'touchstart' : 'mousedown', fn, false);
+    };
+    var touchmove = function(fn) {
+      document.addEventListener(useTouch ? 'touchmove' : 'mousemove', fn, false);
+    };
+    var touchend = function(fn) {
+      document.addEventListener(useTouch ? 'touchend' : 'mouseup', fn, false);
+    };
     return {
       touchstart: touchstart,
       touchmove: touchmove,
@@ -988,8 +969,12 @@
       var levelList = $('#level .levelList');
       levelList.empty();
       for(var i = 1; i<=g_maxLevel; ++i) {
-        var level = ('<li class="level"></li>');
-        levelList.append(level);
+        var level = data_levels[i-1];
+        var levelNode = $('<li class="level"></li>');
+        levelNode.append($('<a href="javascript:;">'+(level.name)+'</a>').click(function(){
+          lta.Game.start(i);
+        }));
+        levelList.append(levelNode);
       }
     };
     
