@@ -1052,9 +1052,7 @@
         
         safeStoreReachLevel(1); // minimum level is level 1
         
-        $('#game').bind('levelWin', function(){
-          safeStoreReachLevel(g_currentLevel);
-        });
+        Game.start();
         
         $('#game').bind('levelStarted', function(){
           $('#play .toolbar h1').text('Level '+g_currentLevel);
@@ -1062,6 +1060,12 @@
         $('#game').bind('levelStarted gridChanged', function(){
           storeContinuableGame(getCurrentContinuableGame());
         });
+        $('#game').bind('levelWin', function(){
+          safeStoreReachLevel(g_currentLevel);
+        });
+        
+        
+        /*
 
         $('#home').bind('pageAnimationStart', function(event, info){
           if(info.direction=="in")
@@ -1087,6 +1091,7 @@
             Levels.init(retrieveReachLevel() || 1);
           }
         });
+        */
         
       }
     }

@@ -2,45 +2,21 @@
 <html>
   <head>
     <title>Light Them All</title>
-    <link rel="stylesheet" href="lib/jqtouch/jqtouch.min.css" type="text/css" media="screen" charset="utf-8" />
     <link rel="stylesheet" href="stylesheets/main.css" type="text/css" media="screen" charset="utf-8" />
-    <link rel="stylesheet" href="stylesheets/theme.css" media="screen" charset="utf-8" /> 
-    <script src="lib/jquery-1.4.2.min.js" type="text/javascript"></script>
-    <script src="lib/jqtouch/jqtouch.min.js" type="text/javascript"></script>
+    <script src="lib/jquery.min.js" type="text/javascript"></script>
+    <script src="lib/underscore-min.js" type="text/javascript"></script>
+    <script src="lib/backbone-min.js" type="text/javascript"></script>
+    <script src="lib/jquery.min.js" type="text/javascript"></script>
+    <script src="lib/json2.js" type="text/javascript"></script>
     
     <script type="text/javascript">
     lta = {};
     
-    $.jQTouch({
-      icon: 'images/icon.png',
-      statusBar: 'black-translucent',
-      preloadImages: [
-        'stylesheets/img/chevron_white.png',
-        'stylesheets/img/bg_row_select.gif',
-        'stylesheets/img/back_button_clicked.png',
-        'stylesheets/img/button_clicked.png',
-        'images/tool/cone.png',
-        'images/tool/double.png',
-        'images/tool/quad.png',
-        'images/tool/refractor.png',
-        'images/tool/simple.png',
-        'images/tool/spliter.png',
-        'images/tool/triangle.png',
-        'images/bomb.png'
-      ]
-    });
     </script>
-    
-    <script src="javascripts/pretty.js" type="text/javascript"></script>
-    <script src="javascripts/json2.js" type="text/javascript"></script>
-    <script src="javascripts/types.js" type="text/javascript"></script>
-    <script src="javascripts/main.js" type="text/javascript"></script>
-    <script src="levels/levels.js" type="text/javascript"></script>
   </head>
   <body>
     
-    
-    
+    <!--
     <section id="home">
       <div class="toolbar">
         <h1>Light Them All</h1>
@@ -61,30 +37,42 @@
         </li>
       </ul>
     </section>
+    -->
     
     <section id="play">
       <div id="resources">
         <audio id="audio_drop" autobuffer>
           <source src="sounds/drop.ogg" />
           <source src="sounds/drop.mp3" />
-          <source src="sounds/mobile/drop.wav" />
+          <source src="sounds/drop.wav" />
         </audio>
         <audio id="audio_turn" autobuffer>
           <source src="sounds/turn.ogg" />
           <source src="sounds/turn.mp3" />
-          <source src="sounds/mobile/turn.wav" />
+          <source src="sounds/turn.wav" />
         </audio>
         <audio id="audio_finished" autobuffer>
           <source src="sounds/finished.ogg" />
           <source src="sounds/finished.mp3" />
-          <source src="sounds/mobile/finished.wav" />
+          <source src="sounds/finished.wav" />
         </audio>
         <img id="image_bomb" src="images/bomb.png" />
+        <img src="images/tool/cone.png" />
+        <img src="images/tool/double.png" />
+        <img src="images/tool/quad.png" />
+        <img src="images/tool/refractor.png" />
+        <img src="images/tool/simple.png" />
+        <img src="images/tool/spliter.png" />
+        <img src="images/tool/triangle.png" />
       </div>
+      
+      <!--
       <div class="toolbar">
         <h1></h1>
-        <a href="#" class="back">back</a>
+        <a href="#" class="back">menu</a>
       </div>
+      -->
+      
       <div id="game">
         <div class="gameGrid">
           <div class="cases"></div>
@@ -94,10 +82,11 @@
       </div>
     </section>
     
+    <!--
     <section id="level">
       <div class="toolbar">
         <h1>Select level</h1>
-        <a href="#" class="back">back</a>
+        <a href="#" class="back">menu</a>
       </div>
       <ul class="levelList"></ul>
     </section>
@@ -105,8 +94,16 @@
     <section id="help">
       <div class="toolbar">
         <h1>Help</h1>
-        <a href="#" class="back">back</a>
+        <a href="#" class="back">menu</a>
       </div>
     </section>
+    -->
+    
+    
+    <script src="javascripts/pretty.js" type="text/javascript"></script>
+    <script src="javascripts/types.js" type="text/javascript"></script>
+    <script src="javascripts/main.js" type="text/javascript"></script>
+    <script src="levels/levels.js" type="text/javascript"></script>
+    
   </body>
 </html>
