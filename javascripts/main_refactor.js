@@ -127,6 +127,7 @@ $(function(){
   var Tool = lta.Tool = Backbone.MapObject.extend({
     
      initialize: function() {
+       this.set({ kind: 'tool' });
        var type = this.get('type');
        var icon = new Image();
        icon.src = 'images/tool/'+(type.toLowerCase())+'.png';
@@ -160,18 +161,22 @@ $(function(){
     
   });
   
+  // Manage the laser canvas
   var RayTracer = lta.RayTracer = Backbone.View.extend({
     
   });
   
+  // Manage the bottom panel with tools
   var Panel = lta.Panel = Backbone.View.extend({
     
   });
   
+  // Manage the grid canvas (objects canvas)
   var GridView = lta.GridView = Backbone.View.extend({
     
   });
   
+  // Manage the game
   var Game = lta.Game = Backbone.Controller.extend({
     
   });
