@@ -65,6 +65,117 @@ $(function(){
 
   });
   
-
+  var Orientation = lta.Orientation = Backbone.Model.extend({
+    TOPLEFT: 0, TOP: 1, TOPRIGHT: 2, RIGHT: 3, BOTTOMRIGHT: 4, BOTTOM: 5, BOTTOMLEFT: 6, LEFT: 7,
+    
+    initialize: function(){
+      var orientation = this.get('orientation');
+      if(orientation) {
+        orientation = orientation.replace(' ', '').toUpperCase()
+        var value = -1;
+        if(typeof(this[orientation])==='number')
+          value = this[orientation];
+        this.set({ value: value });
+      }
+    },
+    
+    next: function(){
+      var val = this.get('value');
+      return new Orientation({ value: val==7 ? 0 : val+1 });
+    },
+    prev: function(){
+      var val = this.get('value');
+      return new Orientation({ value: val==0 ? 7 : val-1 });
+    },
+    toRadian: function() {
+      return (this.get('value')-3) * Math.PI / 4;
+    },
+    movePosition: function(x, y) {
+      var val = this.get('value');
+      if(val==types.Orientation.TOPLEFT)
+        return {x: x-1, y: y-1};
+      if(val==types.Orientation.TOP)
+        return {x: x, y: y-1};
+      if(val==types.Orientation.TOPRIGHT)
+        return {x: x+1, y: y-1};
+      if(val==types.Orientation.RIGHT)
+        return {x: x+1, y: y};
+      if(val==types.Orientation.BOTTOMRIGHT)
+        return {x: x+1, y: y+1};
+      if(val==types.Orientation.BOTTOM)
+        return {x: x, y: y+1};
+      if(val==types.Orientation.BOTTOMLEFT)
+        return {x: x-1, y: y+1};
+      if(val==types.Orientation.LEFT)
+        return {x: x-1, y: y};
+    }
+  });
+  
+  /*
+   * A game object displayable on the Map
+   * - kind : receptor, laser, wall, bomb, tool
+   */
+  var MapObject = lta.MapObject = Backbone.Model.extend({
+    
+    ray: function() {
+      
+    }
+    
+    // Some methods used by map view
+  });
+  
+  var Tool = lta.Tool = Backbone.MapObject.extend({
+    
+     initialize: function() {
+       var type = this.get('type');
+       var icon = new Image();
+       icon.src = 'images/tool/'+(type.toLowerCase())+'.png';
+       this.set({icon: icon});
+     },
+     
+     ray: function(orientation, color) {
+       
+     }
+    
+  });
+  
+  var ToolCollection = lta.ToolCollection = Backbone.Collection.extend({
+    model: Tool
+  });
+  
+  
+  var Sound = lta.Sound = Backbone.Model.extend({
+    
+  });
+  
+  var Level = lta.Level = Backbone.Model.extend({
+    
+  });
+  
+  var Case = lta.Case = Backbone.Model.extend({
+    
+  });
+  
+  var Grid = lta.Grid = Backbone.Model.extend({
+    
+  });
+  
+  var RayTracer = lta.RayTracer = Backbone.View.extend({
+    
+  });
+  
+  var Panel = lta.Panel = Backbone.View.extend({
+    
+  });
+  
+  var GridView = lta.GridView = Backbone.View.extend({
+    
+  });
+  
+  var Game = lta.Game = Backbone.Controller.extend({
+    
+  });
+  
+  
 });
 
