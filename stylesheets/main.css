@@ -4,6 +4,7 @@ body {
    user-select: none;
    height: 100%;
    overflow: hidden;
+   background: black;
 }
 
 li.continueGame .date {
