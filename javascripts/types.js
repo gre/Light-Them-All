@@ -88,7 +88,6 @@
     this.icon = new Image();
     this.icon.src = 'images/tool/'+(type.toLowerCase())+'.png';
     
-    
     this.type = type;
     
     var empty = function() {
