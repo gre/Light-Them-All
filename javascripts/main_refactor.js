@@ -1,6 +1,6 @@
 /// WIP : refactoring with backbone js
 
-$(function(){
+(function(){
   
   if(!console) console = { log: function(){}, error: function(){} };
   
@@ -8,7 +8,27 @@ $(function(){
   var isAndroidOS = /android/i.test(navigator.userAgent);
   var hasTouch = ('ontouchstart' in window);
   
+  var g_width = $(window).width();
+  if(g_width<480) g_width = 320;
+  else g_width = 480;
+  
 (function(lta){
+  
+  var Event = lta.Event = {};
+  (function(Event){
+    _.extend(Event, Backbone.Events);
+    var useTouch = hasTouch && !isChrome;
+    $(document).bind(useTouch ? 'touchstart' : 'mousedown', function(e){
+      Event.trigger('touchstart', e);
+    });
+    $(document).bind(useTouch ? 'touchmove' : 'mousemove', function(e){
+      Event.trigger('touchmove', e);
+    });
+    $(document).bind(useTouch ? 'touchend' : 'mouseup', function(e){
+      Event.trigger('touchend', e);
+    });
+  }(Event));
+  
   
   var Color = lta.Color = Backbone.Model.extend({ 
     // Colors constants
@@ -215,16 +235,34 @@ $(function(){
   });
   
   var Bomb = lta.Bomb = MapObject.extend({
-    
+    defaults: {
+      kind: 'bomb'
+    }
   })
   
   var Laser = lta.Laser = MapObject.extend({
-    
+    defaults: {
+      color: new Color,
+      kind: 'laser'
+    },
+    color: function(val) {
+      if(typeof(val)==='undefined')
+        return this.get('color');
+      this.set({ color: val });
+      return this;
+    }
   })
   
   var Receptor = lta.Receptor = MapObject.extend({
     defaults: {
-      color: new Color
+      color: new Color,
+      kind: 'receptor'
+    },
+    color: function(val) {
+      if(typeof(val)==='undefined')
+        return this.get('color');
+      this.set({ color: val });
+      return this;
     }
   })
   
@@ -261,35 +299,22 @@ $(function(){
     model: MapObject,
     initialize: function(){
       
+    },
+    getByPosition: function(x, y) {
+      return find(function(obj){
+        var pos = obj.position();
+        return (pos.x()==x && pos.y()==y);
+      });
     }
   });
-  
-  var Level = lta.Level = Backbone.Model.extend({
-    initialize: function(){
-      
-    }
-  });
-  
-  var LevelCollection = lta.LevelCollection = Backbone.Collection.extend({
-    model: Level
-  })
-  
-  
-  // Manage the laser canvas
-  var RayTracer = lta.RayTracer = Backbone.View.extend({
-    
-  });
-  
-  // Manage the grid canvas (objects canvas)
-  var GridView = lta.GridView = Backbone.View.extend({
-    
-  });
-  
   
   var PanelTool = lta.PanelTool = Backbone.Model.extend({
     defaults: {
       number: 0,
-      tooltype: 'simple'
+      tooltype: null
+    },
+    initialize: function(){
+      
     },
     number: function(val) {
       if(typeof(val)==='undefined') return this.get('number');
@@ -302,14 +327,295 @@ $(function(){
     model: PanelTool
   })
   
-  // Manage the bottom panel with tools
-  var PanelView = lta.PanelView = Backbone.View.extend({
+  var Level = lta.Level = Backbone.Model.extend({
+    initialize: function(){
+      var cases = []
+      var tools = []
+      _.each(this.get('grid'), function(obj){
+        var clazz = obj[2];
+        var instance = new clazz();
+        instance.position(new Position({ x: obj[0], y: obj[1] }));
+        if(obj[3]) instance.color(new Color(obj[3]));
+        if(obj[4]) instance.orientation(new Orientation(obj[4]));
+        cases.push(instance);
+      })
+      _.each(this.get('tools'), function(t){
+        tools.push(new PanelTool({ number: t.number, tooltype: lta.tools.findByType(t.type) }));
+      })
+      this.map = new Map(cases);
+      this.panel = new Panel(tools);
+      this.width = this.get('width');
+      this.height = this.get('height');
+    },
     
+    start: function(){
+      
+    }
   });
   
-  /// Datas
-  var Tools = new ToolCollection([
-    new ToolType({
+  var LevelCollection = lta.LevelCollection = Backbone.Collection.extend({
+    model: Level,
+    findByNum: function(num) {
+      return this.models[num];
+    }
+  })
+  
+  
+  // Manage the laser canvas
+  var RayTracer = lta.RayTracer = Backbone.View.extend({
+    initialize: function() {
+      
+    },
+    render: function(){
+      
+    }
+  });
+  
+  var Case = lta.Case = Backbone.View.extend({
+    initialize: function() {
+      var appendTo = this.options.container;
+      this.w = this.options.width;
+      this.h = this.options.height;
+      
+      var node = $('<canvas class="case"></canvas>')
+                  .attr('width', this.w)
+                  .attr('height', this.h)
+                  .attr('index', this.options.index)
+                  .attr('x', this.options.x)
+                  .attr('y', this.options.y)
+                  .appendTo(appendTo);
+      
+      this.el = node;
+      this.ctx = this.el[0].getContext('2d');
+      
+      // TODO bind events : hoverin, hoverout
+    },
+    
+    empty: function() {
+      var ctx = this.ctx;
+      this.el[0].width = this.el[0].width;
+      ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(this.w, this.h);
+      ctx.lineTo(0, this.h);
+      ctx.lineTo(0, 0);
+      ctx.lineTo(this.w, 0);
+      ctx.lineTo(this.w, this.h);
+      ctx.closePath();
+      ctx.stroke();
+    },
+    
+    render: function(o) {
+      var ctx = this.ctx;
+      this.empty();
+      ctx.save();
+          
+      switch(o.get('kind')) {
+        case 'tool':
+          ctx.translate(this.w/2, this.h/2);
+          ctx.rotate(o.orientation().toRadian());
+          ctx.drawImage(tooltype.get('icon'), -this.w/2, -this.h/2, this.w, this.h);
+        break;
+        
+        case 'wall':
+          ctx.fillStyle = 'rgb(100,100,100)';
+          ctx.fillRect(4, 4, this.w-8, this.h-8);
+          ctx.fillStyle = 'rgb(150,150,150)';
+          ctx.fillRect(this.w/6, this.h/6, 2*this.w/3, 2*this.h/3);
+        break;
+      
+        case 'bomb':
+          drawImage($('#image_bomb')[0], 0, 0, this.w, this.h)
+        break;
+      
+        case 'receptor':
+          var c = o.color();
+          var rayOver = o.get('rayOver');
+          if(rayOver) {
+            ctx.shadowColor = c.toRgba(400);
+            ctx.shadowBlur = 5;
+            ctx.fillStyle = c.toRgba(1,300);
+          }
+          else {
+            ctx.fillStyle = c.toRgba(1,250);
+          }
+          ctx.beginPath();
+          ctx.arc(this.w/2, this.h/2, this.h/2-4, 0, Math.PI*2, true);
+          ctx.fill();
+          if(rayOver) {
+            ctx.shadowBlur = this.w/4;
+            ctx.shadowColor = c.toRgba(400);
+            fillStyle = c.toRgba(0.8,350);
+          }
+          else
+            fillStyle = c.toRgba(0.8,200);
+          ctx.beginPath();
+          ctx.arc(this.w/2, this.h/2, this.h/4, 0, Math.PI*2, true);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        break;
+      
+        case 'laser':
+          ctx.translate(this.w/2, this.h/2);
+          ctx.rotate(o.orientation().toRadian());
+          ctx.shadowBlur = 2;
+          ctx.strokeStyle = types.Color.rgba(c,0.2,100);
+          ctx.strokeRect(-this.w/2+4, -this.h/4, this.w-8, this.h/2);
+          ctx.fillStyle = c.toRgba(1,150);
+          ctx.fillRect(-this.w/2+4, -this.h/4, this.w-8, this.h/2);
+          ctx.fillStyle = c.toRgba(1,350);
+          ctx.fillRect(4, -this.h/6, this.w/2-8, this.h/3);
+          ctx.fillStyle = c.toRgba(1,400);
+          ctx.fillRect(6, -this.h/6+2, this.w/2-10, this.h/3-4);
+      }
+      
+      ctx.restore();
+    }
+  })
+  
+  // Manage the grid canvas (objects canvas)
+  var GridView = lta.GridView = Backbone.View.extend({
+    initialize: function() {
+      var gridWidth = this.options.gridWidth;
+      var gridHeight = this.options.gridHeight;
+      
+      var caseSize = Math.floor(this.options.width/gridWidth);
+      var width = gridWidth*caseSize;
+      var height = gridHeight*caseSize;
+      
+      this.$('.gameGrid, .gameGrid .cases').width(width).height(height)
+      this.$('canvas.lasers').attr('width', width).attr('height', height);
+      
+      var casesNode = [];
+      var appendTo = this.$('.cases').empty();
+      for(var y=0; y<gridHeight; ++y) {
+        for(var x=0; x<gridWidth; ++x) {
+          var i = y*gridWidth+x;
+          casesNode[i] = new Case({ container: appendTo, width: caseSize, height: caseSize, index: i, x: x, y: y });
+        }
+      }
+      this.cases = casesNode;
+      
+      this.raytracer = new RayTracer({ el: this.$('canvas.lasers'), model: this.model, width: width, height: height });
+      
+      /*
+      
+      var i = 0;
+      for(var y=0; y<gridSize.h; ++y) {
+        for(var x=0; x<gridSize.w; ++x) {
+          var ctx = getCase(x, y);
+          var caseObj = this.model.getByPosition(x, y);
+          switch(caseObj.mapObject) {
+            case types.MapObject.RECEPTOR:
+              new Case(ctx).receptor(caseObj.color);
+            break;
+            case types.MapObject.LASER:
+              new Case(ctx).laser(caseObj.color, caseObj.orientation);
+            break;
+            case types.MapObject.WALL:
+              new Case(ctx).wall();
+            break;
+            case types.MapObject.BOMB:
+              new Case(ctx).bomb();
+            break;
+            default:
+              var c = new Case(ctx);
+              c.empty();
+              var placedTool = getPlacedTool(x, y);
+              if(placedTool) {
+                var toolNodeContainer = $('#game .toolObject[tooltype='+placedTool.tooltype+']:first').parents('.toolObjectContainer:first');
+                if(toolNodeContainer.size()>0) {
+                  var panelObject = new PanelObject(toolNodeContainer);
+                  if(panelObject.number()>0) {
+                    c.tool(placedTool.tooltype, placedTool.orientation);
+                    panelObject.decr();
+                  }
+                }
+              }
+          }
+          ++i;
+        }
+      }
+      */
+    },
+    
+    render: function() {
+      console.log('gridview render');
+      
+      this.raytracer.render();
+    }
+  });
+  
+  // Manage the bottom panel with tools
+  var PanelView = lta.PanelView = Backbone.View.extend({
+    initialize: function() {
+      // this.$('.gamePanel').width(width);
+      
+    },
+    render: function() {
+      
+    }
+  });
+  
+  var LevelView = lta.LevelView = Backbone.View.extend({
+    initialize: function(){
+      var gridHeight = this.model.height;
+      var gridWidth = this.model.width;
+      var width = g_width;
+      
+      this.panel = new PanelView({ el: this.$('.gamePanel'), model: this.model.panel })
+      this.grid = new GridView({ el: this.$('.gameGrid'), model: this.model.map, width: width, gridWidth: gridWidth, gridHeight: gridHeight })
+      this.render();
+    },
+    render: function() {
+      this.panel.render();
+      this.grid.render();
+    }
+  })
+  
+  // Manage the game
+  var GameController = lta.GameController = Backbone.Controller.extend({
+    routes: {
+      '!/': 'home',
+      '!/resume': 'resume',
+      '!/newgame': 'newgame',
+      '!/levels': 'levels',
+      '!/help': 'help',
+      '!/play/:level': 'play'
+    },
+    initialize: function(){
+      
+    },
+    
+    home: function(){
+      
+    },
+    resume: function(){
+      console.log('todo')
+    },
+    newgame: function(){
+      location.hash = '#!/play/0';
+    },
+    levels: function(){
+      console.log('todo');
+    },
+    help: function(){
+      console.log('todo');
+    },
+    play: function(level) {
+      $('#home').hide();
+      var levelObj = lta.levels.findByNum(level);
+      this.view = new LevelView({ el: $('#game'), model: levelObj })
+    }
+  });
+  
+}(window.lta));
+  
+  /// Main
+  
+  lta.tools = new lta.ToolCollection([
+    new lta.ToolType({
       type: 'SIMPLE',
       rayTransforms: {
         topleft: function(color) { return { bottomleft: color } },
@@ -319,7 +625,7 @@ $(function(){
            left: function(color) { return { left: color } }
       }
     }),
-    new ToolType({
+    new lta.ToolType({
       type: 'DOUBLE',
       rayTransforms: {
         topleft: function(color) { return { bottomleft: color } },
@@ -332,7 +638,7 @@ $(function(){
            left: function(color) { return { left: color } }
       }
     }),
-    new ToolType({
+    new lta.ToolType({
       type: 'CONE',
       rayTransforms: {
             top: function(color) { return { left: color } },
@@ -340,14 +646,14 @@ $(function(){
            left: function(color) { return { top: color, bottom: color } }
       }
     }),
-    new ToolType({
+    new lta.ToolType({
       type: 'QUAD',
       rayTransforms: {
           right: function(color) { return { top: color, left: color } },
            left: function(color) { return { top: color, right: color } }
       }
     }),
-    new ToolType({
+    new lta.ToolType({
       type: 'REFRACTOR',
       rayTransforms: {
         topleft: function(color) { return { bottomright: color } },
@@ -356,7 +662,7 @@ $(function(){
            left: function(color) { return { bottomright: color } }
       }
     }),
-    new ToolType({
+    new lta.ToolType({
       type: 'TRIANGLE',
       rayTransforms: {
         topleft: function(color) { return { right: color } },
@@ -364,7 +670,7 @@ $(function(){
         bottomleft: function(color) { return { right: color } }
       }
     }),
-    new ToolType({
+    new lta.ToolType({
       type: 'SPLITER',
       rayTransforms: {
         left: function(color) { return {
@@ -375,14 +681,17 @@ $(function(){
     })
   ]);
   
-  var Levels = new LevelCollection([
+  lta.levels = new lta.LevelCollection([
     {
       name: "Level 1 - Getting started",
       description: "Mirror is the key.",
       
+      width: 10,
+      height: 10,
+      
       grid: [
-        [0, 4, Laser, 'r', 'right'],
-        [6, 9, Receptor, 'r']
+        [0, 4, lta.Laser, 'r', 'right'],
+        [6, 9, lta.Receptor, 'r']
       ],
       
       tools: [
@@ -394,11 +703,14 @@ $(function(){
       name: "Level 2 - Spliting rays",
       description: "One source. Three receptors.",
       
+      width: 10,
+      height: 10,
+      
       grid: [
-        [4, 0, Laser, 'G', 'BOTTOM'],
-        [9, 6, Receptor, 'G'],
-        [6, 9, Receptor, 'G'],
-        [0, 6, Receptor, 'G']
+        [4, 0, lta.Laser, 'G', 'BOTTOM'],
+        [9, 6, lta.Receptor, 'G'],
+        [6, 9, lta.Receptor, 'G'],
+        [0, 6, lta.Receptor, 'G']
       ],
       
       tools: [
@@ -408,12 +720,8 @@ $(function(){
     }
   ])
   
-  // Manage the game
-  var Game = lta.Game = Backbone.Controller.extend({
-    
-  });
+  var game = new lta.GameController();
   
-}(window.lta));
-  
-});
+  Backbone.history.start()
+}());
 
