@@ -301,7 +301,7 @@
       
     },
     getByPosition: function(x, y) {
-      return find(function(obj){
+      return this.find(function(obj){
         var pos = obj.position();
         return (pos.x()==x && pos.y()==y);
       });
@@ -335,14 +335,14 @@
         var clazz = obj[2];
         var instance = new clazz();
         instance.position(new Position({ x: obj[0], y: obj[1] }));
-        if(obj[3]) instance.color(new Color(obj[3]));
-        if(obj[4]) instance.orientation(new Orientation(obj[4]));
+        if(obj[3]) instance.color(new Color({ color: obj[3] }));
+        if(obj[4]) instance.orientation(new Orientation({ orientation: obj[4] }));
         cases.push(instance);
       })
       _.each(this.get('tools'), function(t){
         tools.push(new PanelTool({ number: t.number, tooltype: lta.tools.findByType(t.type) }));
       })
-      this.map = new Map(cases);
+      this.grid = new Map(cases);
       this.panel = new Panel(tools);
       this.width = this.get('width');
       this.height = this.get('height');
@@ -389,6 +389,7 @@
       this.ctx = this.el[0].getContext('2d');
       
       // TODO bind events : hoverin, hoverout
+      
     },
     
     empty: function() {
@@ -409,6 +410,7 @@
     render: function(o) {
       var ctx = this.ctx;
       this.empty();
+      if(!o) return;
       ctx.save();
           
       switch(o.get('kind')) {
@@ -446,10 +448,11 @@
           if(rayOver) {
             ctx.shadowBlur = this.w/4;
             ctx.shadowColor = c.toRgba(400);
-            fillStyle = c.toRgba(0.8,350);
+            ctx.fillStyle = c.toRgba(0.8,350);
           }
-          else
-            fillStyle = c.toRgba(0.8,200);
+          else {
+            ctx.fillStyle = c.toRgba(0.8,200);
+          }
           ctx.beginPath();
           ctx.arc(this.w/2, this.h/2, this.h/4, 0, Math.PI*2, true);
           ctx.fill();
@@ -457,10 +460,11 @@
         break;
       
         case 'laser':
+          var c = o.color();
           ctx.translate(this.w/2, this.h/2);
           ctx.rotate(o.orientation().toRadian());
           ctx.shadowBlur = 2;
-          ctx.strokeStyle = types.Color.rgba(c,0.2,100);
+          ctx.strokeStyle = c.toRgba(0.2,100);
           ctx.strokeRect(-this.w/2+4, -this.h/4, this.w-8, this.h/2);
           ctx.fillStyle = c.toRgba(1,150);
           ctx.fillRect(-this.w/2+4, -this.h/4, this.w-8, this.h/2);
@@ -477,14 +481,15 @@
   // Manage the grid canvas (objects canvas)
   var GridView = lta.GridView = Backbone.View.extend({
     initialize: function() {
-      var gridWidth = this.options.gridWidth;
-      var gridHeight = this.options.gridHeight;
+      var gridWidth = this.gridWidth = this.options.gridWidth;
+      var gridHeight = this.gridHeight = this.options.gridHeight;
       
       var caseSize = Math.floor(this.options.width/gridWidth);
       var width = gridWidth*caseSize;
       var height = gridHeight*caseSize;
       
-      this.$('.gameGrid, .gameGrid .cases').width(width).height(height)
+      this.el.width(width).height(height)
+      this.$('.cases').width(width).height(height)
       this.$('canvas.lasers').attr('width', width).attr('height', height);
       
       var casesNode = [];
@@ -496,62 +501,57 @@
         }
       }
       this.cases = casesNode;
-      
       this.raytracer = new RayTracer({ el: this.$('canvas.lasers'), model: this.model, width: width, height: height });
-      
-      /*
-      
-      var i = 0;
-      for(var y=0; y<gridSize.h; ++y) {
-        for(var x=0; x<gridSize.w; ++x) {
-          var ctx = getCase(x, y);
-          var caseObj = this.model.getByPosition(x, y);
-          switch(caseObj.mapObject) {
-            case types.MapObject.RECEPTOR:
-              new Case(ctx).receptor(caseObj.color);
-            break;
-            case types.MapObject.LASER:
-              new Case(ctx).laser(caseObj.color, caseObj.orientation);
-            break;
-            case types.MapObject.WALL:
-              new Case(ctx).wall();
-            break;
-            case types.MapObject.BOMB:
-              new Case(ctx).bomb();
-            break;
-            default:
-              var c = new Case(ctx);
-              c.empty();
-              var placedTool = getPlacedTool(x, y);
-              if(placedTool) {
-                var toolNodeContainer = $('#game .toolObject[tooltype='+placedTool.tooltype+']:first').parents('.toolObjectContainer:first');
-                if(toolNodeContainer.size()>0) {
-                  var panelObject = new PanelObject(toolNodeContainer);
-                  if(panelObject.number()>0) {
-                    c.tool(placedTool.tooltype, placedTool.orientation);
-                    panelObject.decr();
-                  }
-                }
-              }
-          }
-          ++i;
-        }
-      }
-      */
     },
     
     render: function() {
-      console.log('gridview render');
-      
+      var self = this;
+      _.each(this.cases, function(c, i){
+        var x = i % self.gridWidth;
+        var y = Math.floor(i/self.gridWidth);
+        var o = self.model.getByPosition(x, y);
+        c.render(o);
+      })
       this.raytracer.render();
     }
   });
   
+  var PanelToolView = lta.PanelToolView = Backbone.View.extend({
+    initialize: function() {
+      this.width = this.options.width;
+      this.height = this.options.height;
+      var number = $('<div class="number"></div>');
+      var canvas = $('<canvas class="toolObject"></canvas>')
+                    .attr('width', this.options.width)
+                    .attr('height', this.options.height);
+      this.el.show().empty().append(number).append(canvas);
+      this.ctx = canvas[0].getContext('2d');
+      this.render();
+    },
+    
+    render: function() {
+      this.$('.number').text(this.model.get('number'));
+      var ctx = this.ctx;
+      ctx.save();
+      ctx.translate(this.width/2, this.height/2);
+      ctx.rotate(new Orientation('right').toRadian());
+      ctx.drawImage(this.model.get('tooltype').get('icon'), -this.width/2, -this.height/2, this.width, this.height);
+      ctx.restore();
+    }
+  })
+  
   // Manage the bottom panel with tools
   var PanelView = lta.PanelView = Backbone.View.extend({
     initialize: function() {
-      // this.$('.gamePanel').width(width);
-      
+      var panelWidth = this.options.width;
+      var size = Math.floor(panelWidth / this.model.length);
+      if(size>128) size = 128;
+      this.$('.gamePanel').width(panelWidth).empty();
+      this.model.each(function(o){
+        var tool = $('<div class="toolObjectContainer"></div>');
+        this.$('.gamePanel').append(tool);
+        new PanelToolView({ el: tool, model: o, width: size, height: size });
+      })
     },
     render: function() {
       
@@ -564,8 +564,8 @@
       var gridWidth = this.model.width;
       var width = g_width;
       
-      this.panel = new PanelView({ el: this.$('.gamePanel'), model: this.model.panel })
-      this.grid = new GridView({ el: this.$('.gameGrid'), model: this.model.map, width: width, gridWidth: gridWidth, gridHeight: gridHeight })
+      this.panel = new PanelView({ el: this.$('.gamePanel'), model: this.model.panel, width: width })
+      this.grid = new GridView({ el: this.$('.gameGrid'), model: this.model.grid, width: width, gridWidth: gridWidth, gridHeight: gridHeight })
       this.render();
     },
     render: function() {
