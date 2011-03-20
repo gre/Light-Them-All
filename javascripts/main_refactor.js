@@ -27,6 +27,7 @@
     $(document).bind(useTouch ? 'touchend' : 'mouseup', function(e){
       Event.trigger('touchend', e);
     });
+    
   }(Event));
   
   /// Primary types
@@ -389,6 +390,22 @@
       this.ctx = this.el[0].getContext('2d');
       
       // TODO bind events : hoverin, hoverout
+      this.bind('draghoverin', this.onDragHoverIn);
+      this.bind('draghoverout', this.onDragHoverOut);
+      this.bind('touch', this.onTouch);
+      this.bind('dropped', this.onDropped);
+    },
+    
+    onDragHoverIn: function() {
+      
+    },
+    onDragHoverOut: function() {
+      
+    },
+    onTouch: function() {
+      
+    },
+    onDropped: function() {
       
     },
     
@@ -540,15 +557,18 @@
   })
   
   var PanelView = lta.PanelView = Backbone.View.extend({ // Manage the bottom panel with tools
+    
     initialize: function() {
       var panelWidth = this.options.width;
       var size = Math.floor(panelWidth / this.model.length);
       if(size>128) size = 128;
       this.el.width(panelWidth).empty();
+      var self = this;
+      this.views = []
       this.model.each(function(o){
         var tool = $('<div class="toolObjectContainer"></div>');
-        this.$('.gamePanel').append(tool);
-        new PanelToolView({ el: tool, model: o, width: size, height: size });
+        self.el.append(tool);
+        self.views.push(new PanelToolView({ el: tool, model: o, width: size, height: size }));
       })
     },
     render: function() {
@@ -556,14 +576,161 @@
     }
   });
   
+  var DragHelper = lta.DragHelper = Backbone.View.extend({
+    initialize: function() {
+      var target = this.options.cloneTarget;
+      var clone = target.clone();
+      clone[0].getContext('2d').drawImage(target[0], 0, 0);
+      
+      this.el.append(clone).css({
+        position: 'absolute',
+        width: target.width()+'px',
+        height: target.height()+'px'
+      });
+    }
+  })
+  
   var LevelView = lta.LevelView = Backbone.View.extend({
+    
+    unbindAll: function() {}, // Be changed dynamically on bind
+    bindAll: function() {
+      var self = this;
+      
+      var nodeIsIn = function(node, container) {
+        return (node[0]===container[0] || node.parents().filter(function(i, n){ return n===container[0] }).size()>0);
+      }
+      
+      var delegateEvent = function(obj, eventName, e) {
+        obj.trigger(eventName, e);
+      }
+      
+      var onTouchStart = function(e) { 
+        var target = $(e.target);
+        if(nodeIsIn(target, self.el)) {
+        e.preventDefault();
+          if(target.parent().is('.toolObjectContainer')) target = target.parent();
+          if(target.is('.toolObjectContainer')) {
+            if($('canvas', target).size()==0 || $('.number', target).text()==0) return;
+            
+            self.$('.dragHelper').remove();
+            var dragHelperEl = $('<div class="dragHelper"></div>').hide().appendTo(self.el);
+            var dragHelper = new DragHelper({ el: dragHelperEl, cloneTarget: $('canvas', target) });
+            
+            target.addClass('dragging');
+          }
+          else if(target.is('.case')) {
+            
+          }
+        }
+      }
+      var onTouchEnd = function(e) { 
+        var target = $(e.target);
+        var dragging = self.$('.dragging');
+        var dragHelper = self.$('.dragHelper');
+        if(dragging.size()>0) {
+          dragging.removeClass('dragging');
+          dragging.trigger('dragend');
+          dragHelper.remove();
+          self.$('.case.draghover').removeClass('draghover').trigger('draghoverout').trigger('dropped', dragging);
+        }
+        else if(target.is('.case.touching')) {
+         target.trigger('touch');
+        }
+        self.$('.case.touching').removeClass('touching');
+        
+      }
+      
+      var onTouchMove = function(e) {
+        var target = $(e.target);
+        if(nodeIsIn(target, self.el)) {
+          e.preventDefault(); 
+          var dragHelper = self.$('.dragHelper');
+          var x, y;
+          if(e.type=='touchmove') {
+            x = e.originalEvent.touches[0].pageX;
+            y = e.originalEvent.touches[0].pageY;
+          }
+          else {
+            x = e.pageX;
+            y = e.pageY;
+          }
+          
+          if(self.$('.touching').size()>0 && target.is('.case') && !caseNode.is('.touching')) {
+            var node = self.$('.touching').removeClass('touching').addClass('dragging');
+            // TODO ...
+            /*
+            if(c.role()=='tool') {
+              var dragHelper = $('<div id="dragHelper"></div>').hide().append(new PanelObject($('<canvas />')).init(c.tooltype(), c.orientation()).node()).css({
+                position: 'absolute',
+                width: toolObjectSize.w+'px',
+                height: toolObjectSize.h+'px'
+              });
+              node.addClass('dragging');
+              $('#game').append(dragHelper);
+            }
+            */
+          }
+          
+          var dragging = self.$('.dragging');
+          
+          if(dragging.size()>0) {
+            var left = Math.floor(x-dragging.width()/2-self.el.position().left);
+            var top = Math.floor(y-dragging.height()/2-self.el.position().top);
+            dragHelper.show().css({
+              top: top+'px',
+              left: left+'px'
+            });
+            if(target.is('.case')) {
+              self.$('.dragHelper').addClass('overGrid');
+              if(!target.is('.draghover')) {
+                $(target).addClass('draghover');
+                target.trigger('draghoverin', dragging);
+              }
+              target.removeClass('draghover');
+            }
+            else {
+              self.$('.dragHelper').removeClass('overGrid');
+            }
+            self.$('.case.draghover').each(function(){
+              $(this).removeClass('draghover').trigger('draghoverout', dragging);
+            });
+            if(target.is('.case'))
+              target.addClass('draghover');
+          }
+        }
+      }
+      Event.bind('touchstart', onTouchStart);
+      Event.bind('touchend', onTouchEnd);
+      Event.bind('touchmove', onTouchMove);
+      
+      this.unbindAll(); // Never bind twice
+      this.unbindAll = function() {
+        Event.unbind('touchstart', onTouchStart);
+        Event.unbind('touchend', onTouchEnd);
+        Event.unbind('touchmove', onTouchMove);
+      }
+    },
+    
+    remove: function() {
+      this.unbindAll();
+      this.panel.remove();
+      this.grid.remove();
+      this.el.remove();
+    },
+    
     initialize: function(){
       var gridHeight = this.model.height;
       var gridWidth = this.model.width;
       var width = g_width;
       
+      var template = _.template($('#game_template').html());
+      
+      this.el.html(template());
+        
       this.panel = new PanelView({ el: this.$('.gamePanel'), model: this.model.panel, width: width })
       this.grid = new GridView({ el: this.$('.gameGrid'), model: this.model.grid, width: width, gridWidth: gridWidth, gridHeight: gridHeight })
+      
+      this.bindAll();
       this.render();
     },
     render: function() {
@@ -603,6 +770,7 @@
     play: function(level) {
       $('#home').hide();
       var levelObj = lta.levels.findByNum(level);
+      $('#game').replaceWith('<div id="game" />');
       this.view = new LevelView({ el: $('#game'), model: levelObj })
     }
   });
@@ -717,7 +885,7 @@
     }
   ])
   
-  var game = new lta.GameController();
+  lta.game = new lta.GameController();
   
   Backbone.history.start()
 }());

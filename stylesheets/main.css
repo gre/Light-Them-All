@@ -162,17 +162,17 @@ li.continueGame .date {
   background: rgba(255,255,255,0.8);
 }
 
-#dragHelper {
+.dragHelper {
   z-index: 20;
   background: transparent;
 }
 
-#dragHelper.overGrid.overEmptyCase {
+.dragHelper.overGrid.overEmptyCase {
   background: rgba(100,255,100,0.5);
 }
-#dragHelper.overGrid.overDraggingCase {
+.dragHelper.overGrid.overDraggingCase {
   background: transparent;
 }
-#dragHelper.overGrid {
+.dragHelper.overGrid {
   background: rgba(255,100,100,0.5);
 }
