@@ -29,7 +29,7 @@
     });
   }(Event));
   
-  
+  /// Primary types
   var Color = lta.Color = Backbone.Model.extend({ 
     // Colors constants
     R: 1, G: 2, RG: 3, B: 4, RB: 5, GB: 6, RGB: 7,
@@ -94,7 +94,6 @@
     }
 
   });
-  
   
   var Orientation = lta.Orientation = Backbone.Model.extend({
     TOPLEFT: 0, TOP: 1, TOPRIGHT: 2, RIGHT: 3, BOTTOMRIGHT: 4, BOTTOM: 5, BOTTOMLEFT: 6, LEFT: 7,
@@ -168,9 +167,7 @@
     }
   })
   
-  
-  
-  
+  /// Game types
   var ToolType = lta.ToolType = Backbone.Model.extend({
     initialize: function() {
       var type = this.get('type');
@@ -191,15 +188,14 @@
     }
   })
   
-  var ToolCollection = lta.ToolCollection = Backbone.Collection.extend({
+  var ToolTypes = lta.ToolTypes = Backbone.Collection.extend({
     model: ToolType,
     findByType: function(type) {
       return this.find(function(el){ return el.get('type') === type.toUpperCase() });
     }
   });
   
-  // A game object displayable on the Map
-  var MapObject = lta.MapObject = Backbone.Model.extend({
+  var MapObject = lta.MapObject = Backbone.Model.extend({ // A game object displayable on the Map
     
     defaults: {
       kind: 'none', // receptor, laser, wall, bomb, tool
@@ -284,31 +280,9 @@
   });
   
   
-  var Sound = lta.Sound = Backbone.Model.extend({
-    initialize: function(){
-      this.player =  $(this.get('node')).clone()[0];
-    },
-    play: function() {
-      this.player.play();
-      return this;
-    }
-  });
+  /// Game classes
   
-  // The grid object
-  var Map = lta.Map = Backbone.Collection.extend({
-    model: MapObject,
-    initialize: function(){
-      
-    },
-    getByPosition: function(x, y) {
-      return this.find(function(obj){
-        var pos = obj.position();
-        return (pos.x()==x && pos.y()==y);
-      });
-    }
-  });
-  
-  var PanelTool = lta.PanelTool = Backbone.Model.extend({
+  var PanelTool = lta.PanelTool = Backbone.Model.extend({ // A tool on the panel (number, tooltype)
     defaults: {
       number: 0,
       tooltype: null
@@ -323,11 +297,24 @@
     }
   });
   
-  var Panel = lta.Panel = Backbone.Collection.extend({
+  var Panel = lta.Panel = Backbone.Collection.extend({ // The game panel : a Collection of PanelTool
     model: PanelTool
   })
   
-  var Level = lta.Level = Backbone.Model.extend({
+  var Map = lta.Map = Backbone.Collection.extend({ // The game grid
+    model: MapObject,
+    initialize: function(){
+      
+    },
+    getByPosition: function(x, y) {
+      return this.find(function(obj){
+        var pos = obj.position();
+        return (pos.x()==x && pos.y()==y);
+      });
+    }
+  });
+  
+  var Level = lta.Level = Backbone.Model.extend({ // A level contains a map and a panel
     initialize: function(){
       var cases = []
       var tools = []
@@ -353,7 +340,7 @@
     }
   });
   
-  var LevelCollection = lta.LevelCollection = Backbone.Collection.extend({
+  var Levels = lta.Levels = Backbone.Collection.extend({ // A collection of levels
     model: Level,
     findByNum: function(num) {
       return this.models[num];
@@ -361,8 +348,21 @@
   })
   
   
-  // Manage the laser canvas
-  var RayTracer = lta.RayTracer = Backbone.View.extend({
+  /// Util classes
+  
+  var Sound = lta.Sound = Backbone.Model.extend({
+    initialize: function(){
+      this.player =  $(this.get('node')).clone()[0];
+    },
+    play: function() {
+      this.player.play();
+      return this;
+    }
+  });
+  
+  /// Views
+  
+  var RayTracer = lta.RayTracer = Backbone.View.extend({ // Manage the laser canvas
     initialize: function() {
       
     },
@@ -478,8 +478,7 @@
     }
   })
   
-  // Manage the grid canvas (objects canvas)
-  var GridView = lta.GridView = Backbone.View.extend({
+  var GridView = lta.GridView = Backbone.View.extend({ // Manage the grid canvas (objects canvas)
     initialize: function() {
       var gridWidth = this.gridWidth = this.options.gridWidth;
       var gridHeight = this.gridHeight = this.options.gridHeight;
@@ -540,13 +539,12 @@
     }
   })
   
-  // Manage the bottom panel with tools
-  var PanelView = lta.PanelView = Backbone.View.extend({
+  var PanelView = lta.PanelView = Backbone.View.extend({ // Manage the bottom panel with tools
     initialize: function() {
       var panelWidth = this.options.width;
       var size = Math.floor(panelWidth / this.model.length);
       if(size>128) size = 128;
-      this.$('.gamePanel').width(panelWidth).empty();
+      this.el.width(panelWidth).empty();
       this.model.each(function(o){
         var tool = $('<div class="toolObjectContainer"></div>');
         this.$('.gamePanel').append(tool);
@@ -574,8 +572,7 @@
     }
   })
   
-  // Manage the game
-  var GameController = lta.GameController = Backbone.Controller.extend({
+  var GameController = lta.GameController = Backbone.Controller.extend({ // Manage the game
     routes: {
       '!/': 'home',
       '!/resume': 'resume',
@@ -614,7 +611,7 @@
   
   /// Main
   
-  lta.tools = new lta.ToolCollection([
+  lta.tools = new lta.ToolTypes([
     new lta.ToolType({
       type: 'SIMPLE',
       rayTransforms: {
@@ -681,7 +678,7 @@
     })
   ]);
   
-  lta.levels = new lta.LevelCollection([
+  lta.levels = new lta.Levels([
     {
       name: "Level 1 - Getting started",
       description: "Mirror is the key.",
